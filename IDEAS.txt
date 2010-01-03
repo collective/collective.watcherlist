@@ -1,0 +1,69 @@
+Ideas for collective.watcherlist
+================================
+
+Main idea: Poi currently has a watcher list on an issue.  If you add
+your email address, you get notified when a response is added.  The
+issue creator is automatically notified and is not on that list (I
+think).  If you want to get notified when a new issue is added, I do
+not think that is currently possible.  Tracker managers get notified
+of all new issues and responses.
+
+So who gets notified why is scattered all over the place.  And the
+code for that is mostly inside the content types, including code for
+sending emails.
+
+Also, I think the email sending code in Poi is actually quite good,
+with lots of bugs squashed.
+
+So we could split the good stuff out into a more general package,
+called e.g. collective.watcherlist.  Poi could use that.
+
+
+Basic ideas, handy for Poi
+--------------------------
+
+- Keep a list of watchers on an object.
+
+- Allow username (currently logged in user) or email address.
+
+- An event handler takes care of sending emails to all watchers.
+
+- Acquisition: if you are watching an issue tracker, you should get
+  emails for the issues within it as well.  So allow subscribing to
+  subobject changes if that makes sense.
+
+- Add footer like this: "You are getting this email because <reason>"
+
+- Add unsubscribe option in each email.
+
+- First version could simply only allow subscribing and unsubscribing
+  to logged in users.  Makes things a lot simpler, without the need
+  for PasswordResetTool-like confirmation emails.
+
+- Weird idea: could email-address subscribing be done in a PAS plugin?
+  Probably just silly. :-)
+
+- Register content type specific emails.
+  queryUtility((context, request), name='notification_email')
+  or
+  queryUtility((event, context), name='notification_email')
+
+- Plain text, restructured text (Poi tries this), html?
+
+- Poi: subscribe managers automatically to additions of issues and
+  responses.
+
+- Look at possible overlap with plone.app.contentrules.
+
+
+Ideas in the context of news letters
+------------------------------------
+
+- Allow triggering an event that mails the current page to all
+  subscribers/watchers.
+
+- Export subscribers list.
+
+- Allow only member subscriptions yes/no.
+
+- Allow text/html yes/no.
