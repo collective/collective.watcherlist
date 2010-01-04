@@ -3,7 +3,7 @@ from Products.CMFPlone.utils import getSiteEncoding
 from Products.CMFPlone.utils import safe_unicode
 
 
-def charset(self):
+def charset():
     """Character set to use for encoding the email.
 
     If encoding fails we will try some other encodings.  We hope
@@ -16,8 +16,7 @@ def charset(self):
     return charset
 
 
-def su(self, value):
+def su(value):
     """Return safe unicode version of value.
     """
-    charset = self.charset()
-    return safe_unicode(value, encoding=charset)
+    return safe_unicode(value, encoding=charset())
