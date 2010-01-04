@@ -61,7 +61,7 @@ class WatcherList(object):
         if mailingList:
             addresses.add(mailingList)
         else:
-            addresses.union_update([self._getMemberEmail(x, portal_membership)
+            addresses.union_update([self._get_member_email(x, portal_membership)
                                     for x in self.getManagers() or []])
 
         # Specific for issues:
@@ -93,7 +93,7 @@ class WatcherList(object):
 
         XXX See extra_addresses
         """
-        return self._getMemberEmail()
+        return self._get_member_email()
 
     def toggleWatching(self):
         """Add or remove the current authenticated member from the watchers.
@@ -160,7 +160,7 @@ class WatcherList(object):
         addresses = sets.Set()
 
         portal_membership = getToolByName(self.context, 'portal_membership')
-        addresses.union_update([self._getMemberEmail(w, portal_membership)
+        addresses.union_update([self._get_member_email(w, portal_membership)
                                 for w in self.watchers])
         addresses.union_update(self.extra_addresses)
 
@@ -173,12 +173,12 @@ class WatcherList(object):
         # Discard invalid addresses:
         addresses.discard(None)
         # Discard current user:
-        email = self._getMemberEmail()
+        email = self._get_member_email()
         addresses.discard(email)
 
         return tuple(addresses)
 
-    def _getMemberEmail(self, username=None, portal_membership=None):
+    def _get_member_email(self, username=None, portal_membership=None):
         """Query portal_membership to figure out the specified email address
         for the given user (via the username parameter) or return None if none
         is present.
