@@ -50,6 +50,11 @@ class BaseMail(BrowserView):
         """
         return u'[No subject]'
 
+    def update(self, **kw):
+        """Override this method to do something with the keyword arguments.
+        """
+        pass
+
     def __call__(self):
         """Render the e-mail.
 
