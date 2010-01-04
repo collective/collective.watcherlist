@@ -77,15 +77,15 @@ class WatcherList(object):
 
     extra_addresses = property(__get_extra_addresses, __set_extra_addresses)
 
-    def __get_send_mails(self):
-        return self.__mapping.get('send_mails', True)
+    def __get_send_emails(self):
+        return self.__mapping.get('send_emails', True)
 
-    def __set_send_mails(self, v):
+    def __set_send_emails(self, v):
         if not isinstance(v, bool):
             v = bool(v)
-        self.__mapping['send_mails'] = v
+        self.__mapping['send_emails'] = v
 
-    send_mails = property(__get_send_mails, __set_send_mails)
+    send_emails = property(__get_send_emails, __set_send_emails)
 
     def getDefaultContactEmail(self):
         """Get the default email address, that of the creating user.
@@ -154,7 +154,7 @@ class WatcherList(object):
         any full names.  That is what Poi has been doing, and it makes
         a few things simpler.
         """
-        if not self.send_mails:
+        if not self.send_emails:
             return []
 
         # make sure no duplicates are added
