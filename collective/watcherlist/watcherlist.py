@@ -10,7 +10,7 @@ from zope.interface import implements
 import sets
 
 from collective.watcherlist.interfaces import IWatcherList
-from collective.watcherlist.mailer import EmailSender
+from collective.watcherlist.mailer import simple_send_mail
 
 logger = logging.getLogger('collective.watcherlist')
 
@@ -223,6 +223,4 @@ class WatcherList(object):
             mail_content.update(**kw)
         message = mail_content.prepare_email_message()
         subject = mail_content.subject
-
-        sender = EmailSender()
-        sender.send_mail(message, addresses, subject)
+        simple_send_mail(message, addresses, subject)

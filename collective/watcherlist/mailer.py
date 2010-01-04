@@ -15,72 +15,52 @@ else:
     USE_SECURE_SEND = True
 
 
-class EmailSender(object):
+def simple_send_mail(message, addresses, subject, immediate=True):
+    """Send a notification email to the list of addresses.
 
-    def send_mail(self, message, addresses, subject):
-        """Send a notification email to the list of addresses.
+    The method is called 'simple' because all the clever stuff should
+    already have been done by the caller.
 
-        context is the object about which an email should be sent.
+    message is passed without change to the mail host.  It should
+    probably be a correctly encoded Message or MIMEText.
 
-        view_name is the browser view that will be used for sending.
-        We are looking for attributes 'html' and 'plain'.
+    One mail with the given message and subject is sent for each address.
 
-        Adapted from PoiTracker.
+    Note that with Plone 4 (Zope 2.12) by default the sending is
+    deferred to the end of the transaction.  This means an exception
+    would roll back the transaction.  We usually do not want that, as
+    the email sending is an extra: we do not mind too much if sending
+    fails.  Luckily we have the option to send immediately, so we can
+    catch and ignore exceptions.  In this method we do that.  You can
+    override that by passing immediate=False.  Note that in Plone 3
+    this has no effect at all.
+    """
+    mail_host = utils.get_mail_host()
+    if mail_host is None:
+        logger.warn("Cannot send notification email: please configure "
+                    "MailHost correctly.")
+        return
 
-        XXX Note to self [maurits]: look at this blog post from Marius
-        Gedminas, titled "Sending Unicode emails in Python":
-        http://mg.pov.lt/blog/unicode-emails-in-python.html
+    mfrom = utils.get_mail_from_address()
+    header_charset = utils.get_charset()
 
-        Some other interesting stuff:
-
-        http://maurits.vanrees.org/weblog/archive/2009/09/international-emails
-
-        http://plone.org/documentation/manual/upgrade-guide/version/upgrading-plone-3-x-to-4.0/updating-add-on-products-for-plone-4.0/mailhost.securesend-is-now-deprecated-use-send-instead
-
-        """
-        mail_host = utils.get_mail_host()
-        if mail_host is None:
-            logger.warn("Cannot send notification email: please configure "
-                        "MailHost correctly.")
-            return
-
-        mfrom = utils.get_mail_from_address()
-        charset = utils.get_charset()
-
-        for address in addresses:
-            # Perhaps offer to send one mail to all users,
-            # probably in bcc then; we should have one general email
-            # address in the To address then.
-            #
-            # Hm, but we may want to add a link at the bottom where they
-            # can unsubscribe/unwatch this item, and for everyone that
-            # could be a different link.  So never mind.
-
-            try:
-                # Note that charset is only used for the headers, not
-                # for the body text as that is a Message/MIMEText
-                # already.  Note also that we try to send immediately,
-                # so we can catch and ignore exceptions.
-
-                # Note that 'immediate' only works with Plone 4 (Zope
-                # 2.12).  If we want to support Plone 3 we must use
-                # secureSend.
-                if USE_SECURE_SEND:
-                    mail_host.secureSend(message=message,
-                                         mto=address,
-                                         mfrom=mfrom,
-                                         subject=subject,
-                                         charset=charset)
-                else:
-                    # Make 'immediate' optional?
-                    mail_host.send(message=message,
-                                   mto=address,
-                                   mfrom=mfrom,
-                                   subject=subject,
-                                   immediate=True,
-                                   charset=charset)
-            except (socket.error, SMTPException):
-                logger.warn('Could not send email to %s with subject %s',
-                            address, subject)
-            except:
-                raise
+    for address in addresses:
+        try:
+            if USE_SECURE_SEND:
+                mail_host.secureSend(message=message,
+                                     mto=address,
+                                     mfrom=mfrom,
+                                     subject=subject,
+                                     charset=header_charset)
+            else:
+                mail_host.send(message=message,
+                               mto=address,
+                               mfrom=mfrom,
+                               subject=subject,
+                               immediate=immediate,
+                               charset=header_charset)
+        except (socket.error, SMTPException):
+            logger.warn('Could not send email to %s with subject %s',
+                        address, subject)
+        except:
+            raise
