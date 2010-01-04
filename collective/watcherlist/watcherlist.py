@@ -61,8 +61,9 @@ class WatcherList(object):
         if mailingList:
             addresses.add(mailingList)
         else:
-            addresses.union_update([self._get_member_email(x, portal_membership)
-                                    for x in self.getManagers() or []])
+            addresses.union_update(
+              [self._get_member_email(x, portal_membership)
+               for x in self.getManagers() or []])
 
         # Specific for issues:
         addresses.add(issue.getContactEmail())
@@ -210,7 +211,15 @@ class WatcherList(object):
             email = member.getField('email').getAccessor(member)()
         return email
 
-    def send_mail(self, view_name, **kw):
+    def send(self, view_name, **kw):
+        """Send mail to our addresses using browser view 'view_name'.
+
+        view_name is the name of a browser view for the context.  We
+        use that to get the contents and subject of the email.
+
+        Any keyword arguments will be passed along to the update
+        method of that view.
+        """
         context = aq_inner(self.context)
         addresses = self.addresses
         if not addresses:
