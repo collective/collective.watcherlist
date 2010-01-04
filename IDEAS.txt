@@ -32,9 +32,13 @@ Basic ideas, handy for Poi
   emails for the issues within it as well.  So allow subscribing to
   subobject changes if that makes sense.
 
-- Add footer like this: "You are getting this email because <reason>"
+- Add footer like this: "You are getting this email because <reason>."
+  That could mean we need a different email for each address.
 
-- Add unsubscribe option in each email.
+- Add unsubscribe option in each email.  That could also mean we need
+  a different email for each address as for everyone that could be a
+  different link.  In the case of Poi you can be watching an issue or
+  a tracker.
 
 - First version could simply only allow subscribing and unsubscribing
   to logged in users.  Makes things a lot simpler, without the need
