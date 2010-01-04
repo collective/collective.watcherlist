@@ -187,7 +187,7 @@ class EmailSender(object):
             except (socket.error, SMTPException), exc:
                 log_exc(('Could not send email from %s to %s regarding issue '
                          'in tracker %s\ntext is:\n%s\n') % (
-                        mfrom, address, self.absolute_url(), email_msg))
+                        mfrom, address, context.absolute_url(), email_msg))
                 log_exc("Reason: %s: %r" % (exc.__class__.__name__, str(exc)))
             except:
                 raise
