@@ -1,7 +1,8 @@
-from zope.app.component.hooks import getSite
-from Products.CMFPlone.utils import getSiteEncoding
-from Products.CMFPlone.utils import safe_unicode
+from email.MIMEText import MIMEText
+from email.MIMEMultipart import MIMEMultipart
 from Products.Five.browser import BrowserView
+
+from collective.watcherlist import utils
 
 
 class BaseMail(BrowserView):
@@ -12,25 +13,6 @@ class BaseMail(BrowserView):
 
     Has a few extra methods that may come in handy.
     """
-
-    @property
-    def charset(self):
-        """Character set to use for encoding the email.
-
-        If encoding fails we will try some other encodings.  We hope
-        to get utf-8 here always actually.
-        """
-        portal = getSite()
-        charset = portal.getProperty('email_charset', '')
-        if not charset:
-            charset = getSiteEncoding()
-        return charset
-
-    def su(self, value):
-        """Return safe unicode version of value, using our preferred charset.
-        """
-        charset = self.charset
-        return safe_unicode(value, encoding=charset)
 
     @property
     def html(self):
@@ -72,3 +54,36 @@ class BaseMail(BrowserView):
         elif type_ == 'subject':
             return self.subject
         return self.html
+
+    def prepare_email_message(self, **kw):
+        if kw:
+            self.update(**kw)
+        plain = self.plain
+        html = self.html
+
+        # XXX We are currently sending plain text plus html here.  If
+        # they are not both available, we could simplify the message.
+        email_msg = MIMEMultipart('alternative')
+        email_msg.epilogue = ''
+
+        # We must choose the body charset manually.  Note that the
+        # goal and effect of this loop is to determine the
+        # body_charset.
+        for body_charset in 'US-ASCII', utils.get_charset(), 'UTF-8':
+            try:
+                plain.encode(body_charset)
+                html.encode(body_charset)
+            except UnicodeError:
+                pass
+            else:
+                break
+        # Encoding should work now; let's replace errors just in case.
+        plain.encode(body_charset, 'replace')
+        html.encode(body_charset, 'xmlcharrefreplace')
+
+        text_part = MIMEText(plain, 'plain', body_charset)
+        email_msg.attach(text_part)
+
+        html_part = MIMEText(html, 'html', body_charset)
+        email_msg.attach(html_part)
+        return email_msg

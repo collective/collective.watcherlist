@@ -1,3 +1,5 @@
+import logging
+from zope.component import getMultiAdapter
 from AccessControl import Unauthorized
 from Acquisition import aq_inner, aq_parent
 from Products.CMFCore.utils import getToolByName
@@ -8,6 +10,9 @@ from zope.interface import implements
 import sets
 
 from collective.watcherlist.interfaces import IWatcherList
+from collective.watcherlist.mailer import EmailSender
+
+logger = logging.getLogger('collective.watcherlist')
 
 
 class WatcherList(object):
@@ -204,3 +209,20 @@ class WatcherList(object):
             # property is protected via AT security
             email = member.getField('email').getAccessor(member)()
         return email
+
+    def send_mail(self, view_name, **kw):
+        context = aq_inner(self.context)
+        addresses = self.addresses
+        if not addresses:
+            logger.info("No addresses found.")
+            return
+
+        request = context.REQUEST
+        mail_content = getMultiAdapter((context, request), name=view_name)
+        if kw:
+            mail_content.update(**kw)
+        message = mail_content.prepare_email_message()
+        subject = mail_content.subject
+
+        sender = EmailSender()
+        sender.send_mail(message, addresses, subject)
