@@ -40,11 +40,13 @@ class WatcherList(object):
         annotations = IAnnotations(self.context)
         self.__mapping = annotations.get(self.ANNO_KEY, None)
         if self.__mapping is None:
-            self.__mapping = PersistentDict()
+            self.__mapping = PersistentDict(
+                watchers=PersistentList(),
+                extra_addresses= PersistentList())
             annotations[self.ANNO_KEY] = self.__mapping
 
     def __get_watchers(self):
-        return self.__mapping.get('watchers', PersistentList())
+        return self.__mapping.get('watchers')
 
     def __set_watchers(self, v):
         if not isinstance(v, PersistentList):
@@ -68,7 +70,7 @@ class WatcherList(object):
         # Specific for issues:
         addresses.add(issue.getContactEmail())
         """
-        return self.__mapping.get('extra_addresses', PersistentList())
+        return self.__mapping.get('extra_addresses')
 
     def __set_extra_addresses(self, v):
         if not isinstance(v, PersistentList):
