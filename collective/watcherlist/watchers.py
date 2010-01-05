@@ -96,7 +96,7 @@ class WatcherList(object):
         """
         return self._get_member_email()
 
-    def toggleWatching(self):
+    def toggle_watching(self):
         """Add or remove the current authenticated member from the watchers.
 
         Taken from PoiIssue.
