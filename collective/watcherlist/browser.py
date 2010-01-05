@@ -84,4 +84,39 @@ class BaseMail(BrowserView):
 
         html_part = MIMEText(html, 'html', body_charset)
         email_msg.attach(html_part)
+
+        """
+        We want to do this:
         return email_msg
+        But that gives a traceback:
+  Module collective.watcherlist.mailer, line 62, in simple_send_mail
+  Module Products.MailHost.MailHost, line 239, in send
+  Module Products.MailHost.MailHost, line 425, in _mungeHeaders
+  Module email.message, line 266, in set_charset
+  Module email.charset, line 389, in body_encode
+  Module email.quoprimime, line 198, in encode
+  Module email.utils, line 76, in fix_eols
+  Module re, line 151, in sub
+TypeError: expected string or buffer
+
+We actually have a list at that point.  A few debugging lines:
+
+(Pdb) email_msg 
+<email.mime.multipart.MIMEMultipart instance at 0xc32eaec>
+(Pdb) email_msg.get_content_type( )
+'multipart/alternative'
+(Pdb) email_msg.get('Content-Type')
+'multipart/alternative'
+(Pdb) email_msg.is_multipart( )
+True
+(Pdb) email_msg.get_payload( )
+[<email.mime.text.MIMEText instance at 0xc82fe0c>, <email.mime.text.MIMEText instance at 0xc33938c>]
+(Pdb) email_msg.attach( "hello world")
+None
+(Pdb) email_msg.get_payload( )
+[<email.mime.text.MIMEText instance at 0xc82fe0c>, <email.mime.text.MIMEText instance at 0xc33938c>, 'hello world']
+
+Looks like a bug in Products.MailHost.
+
+        """
+        return text_part
