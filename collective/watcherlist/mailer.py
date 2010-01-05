@@ -9,7 +9,7 @@ logger = logging.getLogger('collective.watcherlist')
 zope2_egg = pkg_resources.working_set.find(
     pkg_resources.Requirement.parse('Zope2'))
 if zope2_egg and (zope2_egg.parsed_version >=
-                  pkg_resources.parse_version('2.12')):
+                  pkg_resources.parse_version('2.12.3')):
     USE_SECURE_SEND = False
 else:
     USE_SECURE_SEND = True
