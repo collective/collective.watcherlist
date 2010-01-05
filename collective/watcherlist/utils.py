@@ -38,16 +38,13 @@ def get_mail_host():
     Return None in case of problems.
     """
     portal = getSite()
-    mail_host = getToolByName(portal, 'MailHost', None)
-    if mail_host is None:
-        return None
-
     request = portal.REQUEST
     ctrlOverview = getMultiAdapter((portal, request),
                                    name='overview-controlpanel')
     mail_settings_correct = not ctrlOverview.mailhost_warning()
     if not mail_settings_correct:
         return None
+    mail_host = getToolByName(portal, 'MailHost')
     return mail_host
 
 
