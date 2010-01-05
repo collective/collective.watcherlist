@@ -55,9 +55,7 @@ class BaseMail(BrowserView):
             return self.subject
         return self.html
 
-    def prepare_email_message(self, **kw):
-        if kw:
-            self.update(**kw)
+    def prepare_email_message(self):
         plain = self.plain
         html = self.html
 

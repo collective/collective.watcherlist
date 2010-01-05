@@ -228,8 +228,7 @@ class WatcherList(object):
 
         request = context.REQUEST
         mail_content = getMultiAdapter((context, request), name=view_name)
-        if kw:
-            mail_content.update(**kw)
+        mail_content.update(**kw)
         message = mail_content.prepare_email_message()
         subject = mail_content.subject
         simple_send_mail(message, addresses, subject)
