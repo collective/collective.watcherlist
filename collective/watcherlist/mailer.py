@@ -53,7 +53,7 @@ def simple_send_mail(message, addresses, subject, immediate=True):
                                      subject=subject,
                                      charset=header_charset)
             else:
-                mail_host.send(message=message,
+                mail_host.send(message,
                                mto=address,
                                mfrom=mfrom,
                                subject=subject,
