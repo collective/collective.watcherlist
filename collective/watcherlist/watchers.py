@@ -160,13 +160,13 @@ class WatcherList(object):
         # make sure no duplicates are added
         addresses = sets.Set()
 
-        portal_membership = getToolByName(self.context, 'portal_membership')
+        context = aq_inner(self.context)
+        portal_membership = getToolByName(context, 'portal_membership')
         addresses.union_update([self._get_member_email(w, portal_membership)
                                 for w in self.watchers])
         addresses.union_update(self.extra_addresses)
 
         # Get addresses from parent (might be recursive).
-        context = aq_inner(self.context)
         parent_list = IWatcherList(aq_parent(context), None)
         if parent_list is not None:
             addresses.union_update(parent_list.addresses)
