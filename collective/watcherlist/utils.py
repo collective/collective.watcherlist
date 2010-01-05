@@ -19,10 +19,13 @@ def get_charset():
     If encoding fails we will try some other encodings.  We hope
     to get utf-8 here always actually.
     """
+    charset = None
     portal = getSite()
-    charset = portal.getProperty('email_charset', '')
+    if portal is not None:
+        charset = portal.getProperty('email_charset', '')
     if not charset:
-        charset = getSiteEncoding()
+        # This works when portal is None as well, falling back to utf-8.
+        charset = getSiteEncoding(portal)
     return charset
 
 
