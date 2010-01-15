@@ -42,7 +42,7 @@ class WatcherList(object):
         if self.__mapping is None:
             self.__mapping = PersistentDict(
                 watchers=PersistentList(),
-                extra_addresses= PersistentList())
+                extra_addresses=PersistentList())
             annotations[self.ANNO_KEY] = self.__mapping
 
     def __get_watchers(self):
@@ -102,16 +102,26 @@ class WatcherList(object):
         """Add or remove the current authenticated member from the watchers.
 
         Taken from PoiIssue.
+
+        If the current value is a tuple, we keep it that way.
         """
         portal_membership = getToolByName(self.context, 'portal_membership')
         if portal_membership.isAnonymousUser():
             return
         member = portal_membership.getAuthenticatedMember()
         member_id = member.getId()
-        if member_id in self.watchers:
-            self.watchers.remove(member_id)
+        watchers = self.watchers
+        if isinstance(watchers, tuple):
+            watchers = list(watchers)
+            as_tuple = True
         else:
-            self.watchers.append(member_id)
+            as_tuple = False
+        if member_id in self.watchers:
+            watchers.remove(member_id)
+        else:
+            watchers.append(member_id)
+        if as_tuple:
+            self.watchers = tuple(watchers)
 
     def isWatching(self):
         """
