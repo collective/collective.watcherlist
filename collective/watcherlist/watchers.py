@@ -213,6 +213,10 @@ class WatcherList(object):
         else:
             member = portal_membership.getMemberById(username)
         if member is None:
+            if '@' in username:
+                # Use case: explicitly adding a mailing list address
+                # to the watchers.
+                return username
             return None
 
         try:
