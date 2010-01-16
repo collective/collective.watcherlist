@@ -1,6 +1,5 @@
 import logging
 from zope.component import getMultiAdapter
-from AccessControl import Unauthorized
 from Acquisition import aq_inner, aq_parent
 from Products.CMFCore.utils import getToolByName
 from persistent.dict import PersistentDict
@@ -11,6 +10,7 @@ import sets
 
 from collective.watcherlist.interfaces import IWatcherList
 from collective.watcherlist.mailer import simple_send_mail
+from collective.watcherlist.utils import get_member_email
 
 logger = logging.getLogger('collective.watcherlist')
 
@@ -57,18 +57,6 @@ class WatcherList(object):
 
     def __get_extra_addresses(self):
         """Extra email addresses
-
-        # Specific for trackers:
-        mailingList = self.getMailingList()
-        if mailingList:
-            addresses.add(mailingList)
-        else:
-            addresses.union_update(
-              [self._get_member_email(x, portal_membership)
-               for x in self.getManagers() or []])
-
-        # Specific for issues:
-        addresses.add(issue.getContactEmail())
         """
         return self.__mapping.get('extra_addresses')
 
@@ -96,7 +84,7 @@ class WatcherList(object):
 
         XXX See extra_addresses
         """
-        return self._get_member_email()
+        return get_member_email()
 
     def toggle_watching(self):
         """Add or remove the current authenticated member from the watchers.
@@ -174,7 +162,7 @@ class WatcherList(object):
 
         context = aq_inner(self.context)
         portal_membership = getToolByName(context, 'portal_membership')
-        addresses.union_update([self._get_member_email(w, portal_membership)
+        addresses.union_update([get_member_email(w, portal_membership)
                                 for w in self.watchers])
         addresses.union_update(self.extra_addresses)
 
@@ -186,46 +174,10 @@ class WatcherList(object):
         # Discard invalid addresses:
         addresses.discard(None)
         # Discard current user:
-        email = self._get_member_email()
+        email = get_member_email()
         addresses.discard(email)
 
         return tuple(addresses)
-
-    def _get_member_email(self, username=None, portal_membership=None):
-        """Query portal_membership to figure out the specified email address
-        for the given user (via the username parameter) or return None if none
-        is present.
-
-        If username is None, we get the currently authenticated user.
-
-        You can pass along portal_membership to avoid having to look
-        that up twenty times when you call this method twenty times.
-
-        Taken from PoiTracker.
-        """
-
-        if portal_membership is None:
-            portal_membership = getToolByName(self.context,
-                                              'portal_membership')
-
-        if username is None:
-            member = portal_membership.getAuthenticatedMember()
-        else:
-            member = portal_membership.getMemberById(username)
-        if member is None:
-            if '@' in username:
-                # Use case: explicitly adding a mailing list address
-                # to the watchers.
-                return username
-            return None
-
-        try:
-            email = member.getProperty('email')
-        except Unauthorized:
-            # this will happen if CMFMember is installed and the email
-            # property is protected via AT security
-            email = member.getField('email').getAccessor(member)()
-        return email
 
     def send(self, view_name, **kw):
         """Send mail to our addresses using browser view 'view_name'.

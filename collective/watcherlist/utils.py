@@ -6,6 +6,7 @@ except ImportError:
     from email.Utils import parseaddr
     from email.Utils import formataddr
 
+from AccessControl import Unauthorized
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import getSiteEncoding
 from Products.CMFPlone.utils import safe_unicode
@@ -60,3 +61,40 @@ def get_mail_from_address():
         # formataddr probably got confused by special characters.
         mfrom = from_address
     return mfrom
+
+
+def get_member_email(username=None, portal_membership=None):
+    """Query portal_membership to figure out the specified email address
+    for the given user (via the username parameter) or return None if none
+    is present.
+
+    If username is None, we get the currently authenticated user.
+
+    You can pass along portal_membership to avoid having to look
+    that up twenty times when you call this method twenty times.
+
+    Taken from PoiTracker.
+    """
+
+    if portal_membership is None:
+        portal = getSite()
+        portal_membership = getToolByName(portal, 'portal_membership')
+
+    if username is None:
+        member = portal_membership.getAuthenticatedMember()
+    else:
+        member = portal_membership.getMemberById(username)
+    if member is None:
+        if username is not None and '@' in username:
+            # Use case: explicitly adding a mailing list address
+            # to the watchers.
+            return username
+        return None
+
+    try:
+        email = member.getProperty('email')
+    except Unauthorized:
+        # this will happen if CMFMember is installed and the email
+        # property is protected via AT security
+        email = member.getField('email').getAccessor(member)()
+    return email
