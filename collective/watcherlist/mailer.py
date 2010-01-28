@@ -45,6 +45,8 @@ def simple_send_mail(message, addresses, subject, immediate=True):
     header_charset = utils.get_charset()
 
     for address in addresses:
+        if not address:
+            continue
         try:
             if USE_SECURE_SEND:
                 mail_host.secureSend(message=message,
