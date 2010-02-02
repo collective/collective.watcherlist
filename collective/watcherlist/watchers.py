@@ -187,6 +187,9 @@ class WatcherList(object):
 
         Any keyword arguments will be passed along to the update
         method of that view.
+
+        XXX Perhaps allow passing only_these_addresses=[...] to force
+        sending only to those addresses and ignoring all others.
         """
         context = aq_inner(self.context)
         addresses = self.addresses
