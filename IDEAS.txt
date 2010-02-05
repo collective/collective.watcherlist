@@ -71,3 +71,5 @@ Ideas in the context of news letters
 - Allow only member subscriptions yes/no.
 
 - Allow text/html yes/no.
+
+- Convert relative to absolute urls.
