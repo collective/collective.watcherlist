@@ -14,6 +14,8 @@ from collective.watcherlist.utils import get_member_email
 
 logger = logging.getLogger('collective.watcherlist')
 
+_marker = object()
+
 
 class WatcherList(object):
     """Adapter for lists of watchers.
@@ -68,7 +70,26 @@ class WatcherList(object):
     extra_addresses = property(__get_extra_addresses, __set_extra_addresses)
 
     def __get_send_emails(self):
-        return self.__mapping.get('send_emails', True)
+        """Should emails be sent?
+
+        The parent of the context may have a setting for this.  In the
+        context we may or may not wish to override this.  For example,
+        in the case of Poi we only set this on the tracker, not on
+        individual issues.
+        """
+        setting = self.__mapping.get('send_emails', _marker)
+        if setting is not _marker:
+            # We have an explicit setting.
+            return setting
+        # The context has no explicit setting, so we ask the parent.
+        context = aq_inner(self.context)
+        parent_list = IWatcherList(aq_parent(context), None)
+        if parent_list is not None:
+            return parent_list.send_emails
+
+        # No explicit setting, so we fall back to the default: yes, we
+        # send emails.
+        return True
 
     def __set_send_emails(self, v):
         if not isinstance(v, bool):
