@@ -1,11 +1,14 @@
+import os
 from setuptools import setup, find_packages
+
+readme = open(os.path.join('collective', 'watcherlist', 'README.txt')).read()
 
 version = '0.1'
 
 setup(name='collective.watcherlist',
       version=version,
       description="Send emails from Plone to interested members (watchers)",
-      long_description=open("README.txt").read() + "\n" +
+      long_description=readme + "\n" +
                        open("CHANGES.txt").read(),
       classifiers=[
         "Framework :: Plone",

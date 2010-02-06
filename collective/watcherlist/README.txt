@@ -89,7 +89,7 @@ We see if we can get a watcherlist for it::
   >>> watcherlist
   <collective.watcherlist.watchers.WatcherList object at ...>
 
-We can ask several things of this list:
+We can ask several things of this list::
 
   >>> watcherlist.watchers
   []
@@ -103,7 +103,7 @@ a Plone context) the ids of members in the site.  In your package you
 would either create a button or other small form that people can use
 to add themselves to the list, or create some code that automatically
 adds some people, as Poi does for the creator of a new issue.  The
-code is simple:
+code is simple::
 
   >>> watcherlist.watchers.append('maurits@example.org')
   >>> watcherlist.watchers.append('reinout@example.org')
@@ -136,7 +136,7 @@ the Party a request object::
   >>> from zope.publisher.browser import TestRequest
   >>> birthday.REQUEST = TestRequest()
 
-We now send an invitation email, but this fails:
+We now send an invitation email, but this fails::
 
   >>> watcherlist.send('invitation')
   Traceback (most recent call last):
@@ -205,7 +205,7 @@ If there is neither plain text nor html, we do not send anything::
   >>> PartyMail.plain = ''
   >>> watcherlist.send('invitation')
 
-Let's add a bit of html again to see that only html goes fine too:
+Let's add a bit of html again to see that only html goes fine too::
 
   >>> PartyMail.html = '<p>You are invited.</p>'
   >>> watcherlist.send('invitation')

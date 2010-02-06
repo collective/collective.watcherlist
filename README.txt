@@ -1,4 +1,1 @@
-Introduction
-============
-
-
+See collective/watcherlist/README.txt.
