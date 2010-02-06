@@ -42,13 +42,15 @@ def get_mail_host():
     Return None in case of problems.
     """
     portal = getSite()
+    if portal is None:
+        return None
     request = portal.REQUEST
     ctrlOverview = getMultiAdapter((portal, request),
                                    name='overview-controlpanel')
     mail_settings_correct = not ctrlOverview.mailhost_warning()
     if not mail_settings_correct:
         return None
-    mail_host = getToolByName(portal, 'MailHost')
+    mail_host = getToolByName(portal, 'MailHost', None)
     return mail_host
 
 
@@ -78,7 +80,10 @@ def get_member_email(username=None, portal_membership=None):
 
     if portal_membership is None:
         portal = getSite()
-        portal_membership = getToolByName(portal, 'portal_membership')
+        portal_membership = getToolByName(portal, 'portal_membership', None)
+        if portal_membership is None:
+            # unit test of non-CMF site
+            return None
 
     if username is None:
         member = portal_membership.getAuthenticatedMember()

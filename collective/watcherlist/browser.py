@@ -58,11 +58,8 @@ class BaseMail(BrowserView):
     def prepare_email_message(self):
         plain = self.plain
         html = self.html
-
-        # XXX We are currently sending plain text plus html here.  If
-        # they are not both available, we could simplify the message.
-        email_msg = MIMEMultipart('alternative')
-        email_msg.epilogue = ''
+        if not plain and not html:
+            return None
 
         # We must choose the body charset manually.  Note that the
         # goal and effect of this loop is to determine the
@@ -80,9 +77,18 @@ class BaseMail(BrowserView):
         html.encode(body_charset, 'xmlcharrefreplace')
 
         text_part = MIMEText(plain, 'plain', body_charset)
-        email_msg.attach(text_part)
-
         html_part = MIMEText(html, 'html', body_charset)
-        email_msg.attach(html_part)
 
+        # No sense in sending plain text and html when we only have
+        # one of those:
+        if not plain:
+            return html_part
+        if not html:
+            return text_part
+
+        # Okay, we send both plain text and html
+        email_msg = MIMEMultipart('alternative')
+        email_msg.epilogue = ''
+        email_msg.attach(text_part)
+        email_msg.attach(html_part)
         return email_msg

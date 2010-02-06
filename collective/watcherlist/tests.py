@@ -1,17 +1,22 @@
 import unittest
 
+from zope.testing import doctest
 from zope.testing import doctestunit
 from zope.component import testing
 from Testing import ZopeTestCase as ztc
 
-from Products.Five import zcml
-from Products.Five import fiveconfigure
-from Products.PloneTestCase import PloneTestCase as ptc
-from Products.PloneTestCase.layer import PloneSite
-ptc.setupPloneSite()
+#from Products.Five import zcml
+#from Products.Five import fiveconfigure
+#from Products.PloneTestCase import PloneTestCase as ptc
+#from Products.PloneTestCase.layer import PloneSite
+#ptc.setupPloneSite()
+
+OPTIONFLAGS = (doctest.ELLIPSIS |
+               doctest.NORMALIZE_WHITESPACE)
 
 import collective.watcherlist
 
+"""
 class TestCase(ptc.PloneTestCase):
     class layer(PloneSite):
         @classmethod
@@ -23,15 +28,16 @@ class TestCase(ptc.PloneTestCase):
         @classmethod
         def tearDown(cls):
             pass
-
+"""
 
 def test_suite():
     return unittest.TestSuite([
 
         # Unit tests
-        #doctestunit.DocFileSuite(
-        #    'README.txt', package='collective.watcherlist',
-        #    setUp=testing.setUp, tearDown=testing.tearDown),
+        doctestunit.DocFileSuite(
+            'README.txt', package='collective.watcherlist',
+            setUp=testing.setUp, tearDown=testing.tearDown,
+            optionflags=OPTIONFLAGS),
 
         #doctestunit.DocTestSuite(
         #    module='collective.watcherlist.mymodule',

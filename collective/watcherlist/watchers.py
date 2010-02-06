@@ -114,10 +114,12 @@ class WatcherList(object):
 
         If the current value is a tuple, we keep it that way.
         """
-        portal_membership = getToolByName(self.context, 'portal_membership')
-        if portal_membership.isAnonymousUser():
+        memship = getToolByName(self.context, 'portal_membership', None)
+        if memship is None:
             return
-        member = portal_membership.getAuthenticatedMember()
+        if memship.isAnonymousUser():
+            return
+        member = memship.getAuthenticatedMember()
         member_id = member.getId()
         watchers = self.watchers
         if isinstance(watchers, tuple):
@@ -138,8 +140,10 @@ class WatcherList(object):
 
         Taken from PoiIssue.
         """
-        portal_membership = getToolByName(self.context, 'portal_membership')
-        member = portal_membership.getAuthenticatedMember()
+        memship = getToolByName(self.context, 'portal_membership', None)
+        if memship is None:
+            return False
+        member = memship.getAuthenticatedMember()
         return member.getId() in self.watchers
 
     def validate_watchers(self, value=None):
@@ -176,15 +180,21 @@ class WatcherList(object):
         a few things simpler.
         """
         if not self.send_emails:
-            return []
+            return ()
 
         # make sure no duplicates are added
         addresses = sets.Set()
 
         context = aq_inner(self.context)
-        portal_membership = getToolByName(context, 'portal_membership')
-        addresses.union_update([get_member_email(w, portal_membership)
-                                for w in self.watchers])
+        memship = getToolByName(context, 'portal_membership', None)
+        if memship is None:
+            # Okay, either we are in a simple unit test, or someone is
+            # using this package outside of CMF/Plone.  We should
+            # assume the watchers are simple email addresses.
+            addresses.union_update(self.watchers)
+        else:
+            addresses.union_update([get_member_email(w, memship)
+                                    for w in self.watchers])
         addresses.union_update(self.extra_addresses)
 
         # Get addresses from parent (might be recursive).
@@ -222,5 +232,8 @@ class WatcherList(object):
         mail_content = getMultiAdapter((context, request), name=view_name)
         mail_content.update(**kw)
         message = mail_content.prepare_email_message()
+        if not message:
+            logger.warn("Not sending empty email.")
+            return            
         subject = mail_content.subject
         simple_send_mail(message, addresses, subject)
