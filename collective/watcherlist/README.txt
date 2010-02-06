@@ -3,7 +3,7 @@ collective.watcherlist
 
 ``collective.watcherlist`` is a package that enables you to keep a
 list of people who want to receive emails when an item gets updated.
-The main use case is something like Products.Poi, which is an issue
+The main use case is something like Products.Poi_, which is an issue
 tracker for Plone.  That product lets you create an issue tracker.  In
 this tracker people can add issues.  The tracker has managers.
 Everytime a new issue is posted, the managers should receive an email.
@@ -30,9 +30,29 @@ or CMF, contact me: we can probably do some conditional imports
 instead.
 
 ``collective.watcherlist`` might also be usable as a basis for a
-newsletter product.  If you feel Singing and Dancing is overkill for
-you, you could try writing some code around
-``collective.watcherlist``.
+newsletter product.  If you feel `Singing and Dancing`_ is overkill
+for you, or too hard to adapt to your specific needs, you could try
+writing some code around ``collective.watcherlist`` instead.
+
+
+Basic integration steps
+-----------------------
+
+In its simplest form, the integration that is needed, is this:
+
+- Register an adapter from your content type to
+  ``collective.watcherlist.watchers.WatcherList``
+
+- Create an html form where people can add themselves to the watcher
+  list.
+
+- Register a BrowserView for your content type, inheriting from
+  ``collective.watcherlist.browser.BaseMail`` and override its
+  properties ``subject``, ``plain`` and/or ``html``.
+
+- Create an event handler or some other code that gets the adapter for
+  your content type and uses that to send an email with the subject
+  and contents defined in the browser view you created.
 
 
 Sample integration
@@ -227,3 +247,8 @@ If we switch off email sending for this watcherlist... no emails are sent::
 Reset that::
 
   >>> watcherlist.send_emails = True
+
+Look at Products.Poi_ for some more examples of what you can do.
+
+.. _Products.Poi: http://plone.org/products/poi
+.. _`Singing and Dancing`: http://plone.org/products/dancing
