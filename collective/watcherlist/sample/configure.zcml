@@ -1,0 +1,43 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser">
+
+  <adapter
+      for="Products.ATContentTypes.interfaces.IATFolder"
+      factory="collective.watcherlist.watchers.WatcherList"
+      />
+
+  <adapter
+      for="Products.ATContentTypes.interfaces.IATNewsItem"
+      factory="collective.watcherlist.watchers.WatcherList"
+      />
+
+  <subscriber 
+      for="Products.ATContentTypes.interfaces.IATNewsItem
+           Products.DCWorkflow.interfaces.IAfterTransitionEvent"
+      handler=".eventhandlers.mail_news"
+      />
+
+  <browser:page
+     name="newsitem-mail"
+     for="Products.ATContentTypes.interfaces.IATNewsItem"
+     permission="zope2.View"
+     class=".browser.NewsItemMail"
+     />
+
+  <browser:page
+     name="subscription_form"
+     for="Products.ATContentTypes.interfaces.IATFolder"
+     permission="zope2.View"
+     template="form.pt"
+     class=".browser.SubscriptionForm"
+     />
+
+  <browser:page
+     name="subscription_overview"
+     for="Products.ATContentTypes.interfaces.IATFolder"
+     permission="zope2.View"
+     class=".browser.SubscriptionOverview"
+     />
+
+</configure>

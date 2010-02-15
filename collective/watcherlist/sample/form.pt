@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <title>Watch this folder</title>
+  </head>
+  <body>
+    <form action="@@subscription_form"
+          tal:define="isAnon context/@@plone_portal_state/anonymous">
+      <div tal:condition="isAnon">
+        <input
+            type="text"
+            name="email"
+            value=""
+            />
+        <input
+            type="submit"
+            name="submit"
+            value="Subscribe this email address to this folder"
+            />
+      </div>
+      <div tal:condition="not:isAnon">
+        <input tal:condition="view/is_watching"
+               type="submit"
+               name="toggle"
+               value="Unsubscribe this member from this folder"
+               />
+        <input tal:condition="not:view/is_watching"
+               type="submit"
+               name="toggle"
+               value="Subscribe this member to this folder"
+               />
+      </div>
+    </form>
+  </body>
+</html>

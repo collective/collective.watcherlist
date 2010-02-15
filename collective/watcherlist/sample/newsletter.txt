@@ -1,0 +1,99 @@
+Sample integration: newsletter
+------------------------------
+
+We are going to use ``collective.watcherlist`` to create a simple
+newsletter application.
+
+- We will register an adapter from the default Folder content type to
+  ``collective.watcherlist.watchers.WatcherList`` so people can
+  watch this folder, meaning: they will get an email when something
+  interesting happens.
+
+- We will register an adapter from the default News Item content type to
+  ``collective.watcherlist.watchers.WatcherList``.  Theoretically we
+  could use this to let people watch this specific news item (like Poi
+  offers for issues).  But in this case we will handle the watching on
+  the parent folder level and use this adapter just to send an email
+  about this news item.
+
+- We will register an event handler to send an email to the watchers
+  when a news item in the folder gets published.
+
+- We will register a BrowserView for News Items, inheriting from
+  ``collective.watcherlist.browser.BaseMail`` and use this to set the
+  subject and contents of the email.
+
+- We will create a form where an anonymous user can register with his
+  email address.  We keep it simple, so no confirmation email is sent;
+  this is left as an exercise for the reader and can be an interesting
+  contribution.
+
+- We will use the same form to let logged-in members subscribe
+  themselves.
+
+To see how this is done, look at the ``sample`` directory.  Here we
+will run some tests.
+
+
+We start a test browser session as anonymous user and open the
+subscription form::
+
+    >>> browser = self.browser
+    >>> news = self.portal.news
+    >>> browser.open(news.absolute_url() + '/@@subscription_form')
+    >>> "Subscribe this email address to this folder" in browser.contents
+    True
+    >>> browser.getControl(name='email').value = 'guido@example.com'
+    >>> browser.getControl(name='submit').click()
+
+To ease testing a bit, we have defined a very simple browser view that
+anyone can see and that shows the email addresses of the watchers::
+
+    >>> browser.open(news.absolute_url() + '/@@subscription_overview')
+    >>> print browser.contents
+    guido@example.com
+
+We log in as test user and subscribe too::
+
+    >>> self.browser_login()
+    >>> browser.open(news.absolute_url() + '/@@subscription_form')
+    >>> "Subscribe this member to this folder" in browser.contents
+    True
+    >>> browser.getControl(name='toggle').click()
+
+We check the results.  The current user is not actually reported, as
+we assume he does not need to get an email when he himself does
+something that triggers email sending::
+
+    >>> browser.open(news.absolute_url() + '/@@subscription_overview')
+    >>> print browser.contents
+    guido@example.com
+
+We might want to change that, or make it easier for others to change.
+
+Anyway, we logout and see what gets reported now::
+
+    >>> browser.open(self.portal.absolute_url() + '/logout')
+    >>> browser.open(news.absolute_url() + '/@@subscription_overview')
+    >>> print browser.contents
+    guido@example.com
+    testuser@example.com
+
+Now we login as portal owner and publish a news item::
+
+    >>> self.browser_login('portal_owner')
+    >>> browser.open(news.first.absolute_url())
+    >>> browser.getLink('Publish').click()
+    Subject = Newsflash: First News
+    Addresses = ('guido@example.com', 'testuser@example.com')
+    Message =
+    From...
+    MIME-Version: 1.0
+    Content-Type: text/html; charset="us-ascii"
+    Content-Transfer-Encoding: 7bit
+    <BLANKLINE>
+    <p>Have I got news for <em>you</em>!</p>
+
+TODO: use the mock mailhost test case, as currently the previous click
+just prints some debug info like in the unit tests as it cannot find a
+properly configured mailhost.
