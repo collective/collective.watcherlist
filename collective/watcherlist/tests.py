@@ -1,14 +1,18 @@
 import unittest
 
+from Acquisition import aq_base
 from zope.testing import doctest
 from zope.testing import doctestunit
 from zope.component import testing
+from zope.component import getSiteManager
 from Testing import ZopeTestCase as ztc
 
 from Products.Five import zcml
 from Products.Five import fiveconfigure
+from Products.MailHost.interfaces import IMailHost
 from Products.PloneTestCase import PloneTestCase as ptc
 from Products.PloneTestCase.layer import PloneSite
+from Products.CMFPlone.tests.utils import MockMailHost
 ptc.setupPloneSite()
 
 OPTIONFLAGS = (doctest.ELLIPSIS |
@@ -37,6 +41,27 @@ class TestCase(ptc.PloneTestCase):
 
 
 class FunctionalTestCase(TestCase, ptc.FunctionalTestCase):
+
+    def _setup(self):
+        ptc.PloneTestCase._setup(self)
+        # Replace normal mailhost with mock mailhost
+        self.portal._original_MailHost = self.portal.MailHost
+        self.portal.MailHost = mailhost = MockMailHost('MailHost')
+        sm = getSiteManager(context=self.portal)
+        sm.unregisterUtility(provided=IMailHost)
+        sm.registerUtility(mailhost, provided=IMailHost)
+        # Make sure our mock mailhost does not give a mailhost_warning
+        # in the overview-controlpanel.
+        mailhost.smtp_host = 'mock'
+        self.portal.email_from_address = 'admin@example.com'
+
+    def _clear(self, call_close_hook=0):
+        self.portal.MailHost = self.portal._original_MailHost
+        sm = getSiteManager(context=self.portal)
+        sm.unregisterUtility(provided=IMailHost)
+        sm.registerUtility(aq_base(self.portal._original_MailHost),
+                           provided=IMailHost)
+        ptc.PloneTestCase._clear(self)
 
     def afterSetUp(self):
         """Add some extra content and do some setup.

@@ -79,21 +79,41 @@ Anyway, we logout and see what gets reported now::
     guido@example.com
     testuser@example.com
 
+We will be sending out emails, so first we make sure there are no
+messages in our mock mailhost::
+
+    >>> self.portal.MailHost.reset()
+    >>> len(self.portal.MailHost.messages)
+    0
+
 Now we login as portal owner and publish a news item::
 
     >>> self.browser_login('portal_owner')
     >>> browser.open(news.first.absolute_url())
     >>> browser.getLink('Publish').click()
-    Subject = Newsflash: First News
-    Addresses = ('guido@example.com', 'testuser@example.com')
-    Message =
-    From...
+
+We have to watchers, so two emails are sent::
+
+    >>> len(self.portal.MailHost.messages)
+    2
+    >>> print self.portal.MailHost.messages[0]
     MIME-Version: 1.0
     Content-Type: text/html; charset="us-ascii"
     Content-Transfer-Encoding: 7bit
+    Subject: =?utf-8?q?Newsflash=3A_First_News?=
+    To: guido@example.com
+    From: admin@example.com
+    Date: ...
     <BLANKLINE>
     <p>Have I got news for <em>you</em>!</p>
-
-TODO: use the mock mailhost test case, as currently the previous click
-just prints some debug info like in the unit tests as it cannot find a
-properly configured mailhost.
+    >>> print self.portal.MailHost.messages[1]
+    MIME-Version: 1.0
+    Content-Type: text/html; charset="us-ascii"
+    Content-Transfer-Encoding: 7bit
+    Subject: =?utf-8?q?Newsflash=3A_First_News?=
+    To: testuser@example.com
+    From: admin@example.com
+    Date: ...
+    <BLANKLINE>
+    <p>Have I got news for <em>you</em>!</p>
+    >>> self.portal.MailHost.reset()
