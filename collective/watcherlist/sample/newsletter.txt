@@ -154,7 +154,6 @@ mail when an object is modified that has 'i18n' in its title; let's
 trigger that manually or better, by editing::
 
     >>> browser.open(news.first.absolute_url() + '/edit')
-    >>> open('/tmp/test.html', 'w').write(browser.contents)
     >>> browser.getControl(name='title').value = 'First i18n news'
     >>> browser.getControl('Save').click()
     >>> len(self.portal.MailHost.messages)
@@ -173,3 +172,32 @@ Note the different charset and encoding::
     <BLANKLINE>
     Breaking =EFnt=E9rn=E4ti=F3nal news: First i18n news
     >>> self.portal.MailHost.reset()
+
+With Zope 2.12.3 or higher we know that we can use the normal ``send``
+method of the MailHost, but otherwise the secureSend method is better.
+We do want to try both in the tests, so we do the last edit a second
+time::
+
+    >>> import collective.watcherlist.mailer
+    >>> ori_USE_SECURE_SEND = collective.watcherlist.mailer.USE_SECURE_SEND
+    >>> collective.watcherlist.mailer.USE_SECURE_SEND = not ori_USE_SECURE_SEND
+    >>> browser.open(news.first.absolute_url() + '/edit')
+    >>> browser.getControl('Save').click()
+
+The resulting email is slightly different, but still basically the same::
+
+    >>> len(self.portal.MailHost.messages)
+    2
+    >>> print self.portal.MailHost.messages[0]
+    Content-Type: text/plain; charset="utf-8"
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: quoted-printable
+    CC:
+    To: guido@example.com
+    BCC:
+    From: admin@example.com
+    Subject: [No subject]
+    <BLANKLINE>
+    Breaking =EFnt=E9rn=E4ti=F3nal news: First i18n news
+    >>> self.portal.MailHost.reset()
+    >>> collective.watcherlist.mailer.USE_SECURE_SEND = ori_USE_SECURE_SEND
