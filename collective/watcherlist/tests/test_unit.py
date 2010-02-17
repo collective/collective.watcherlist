@@ -17,6 +17,11 @@ def test_suite():
             setUp=testing.setUp, tearDown=testing.tearDown,
             optionflags=OPTIONFLAGS),
 
+        doctestunit.DocFileSuite(
+            'cornercases.txt', package='collective.watcherlist.tests',
+            setUp=testing.setUp, tearDown=testing.tearDown,
+            optionflags=OPTIONFLAGS),
+
         ])
 
 if __name__ == '__main__':

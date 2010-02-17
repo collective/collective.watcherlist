@@ -144,10 +144,16 @@ class WatcherList(object):
         if memship is None:
             return False
         member = memship.getAuthenticatedMember()
+        if member is None:
+            return False
         return member.getId() in self.watchers
 
     def validate_watchers(self, value=None):
         """Make sure watchers are actual user ids.
+
+        Email addresses would be fine too actually.
+
+        XXX Not sure if we want to keep this method.
 
         Taken from PoiIssue.
         """
