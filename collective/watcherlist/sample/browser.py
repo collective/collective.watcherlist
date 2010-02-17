@@ -15,6 +15,15 @@ class NewsItemMail(BaseMail):
         return self.context.getRawText()
 
 
+class InternationalMail(BaseMail):
+
+    @property
+    def plain(self):
+        # This says: Breaking international news
+        return u'Breaking \xefnt\xe9rn\xe4ti\xf3nal news: %s' % (
+            self.context.Title())
+
+
 class SubscriptionForm(BrowserView):
 
     def __call__(self):

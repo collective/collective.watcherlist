@@ -18,11 +18,24 @@
       handler=".eventhandlers.mail_news"
       />
 
+  <subscriber 
+      for="Products.Archetypes.interfaces.IBaseContent
+           zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+      handler=".eventhandlers.mail_i18n"
+      />
+
   <browser:page
      name="newsitem-mail"
      for="Products.ATContentTypes.interfaces.IATNewsItem"
      permission="zope2.View"
      class=".browser.NewsItemMail"
+     />
+
+  <browser:page
+     name="i18n-mail"
+     for="Products.Archetypes.interfaces.IBaseContent"
+     permission="zope2.View"
+     class=".browser.InternationalMail"
      />
 
   <browser:page

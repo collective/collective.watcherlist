@@ -86,9 +86,25 @@ messages in our mock mailhost::
     >>> len(self.portal.MailHost.messages)
     0
 
-Now we login as portal owner and publish a news item::
+Now we login as portal owner.
 
     >>> self.browser_login('portal_owner')
+
+We can use the browser to check what the contents of the mail sent for
+a news item will be.  Default is to show the html content, but we can
+give some options too:
+
+    >>> browser.open(news.first.absolute_url() + '/@@newsitem-mail')
+    >>> print browser.contents
+    <p>Have I got news for <em>you</em>!</p>
+    >>> browser.open(news.first.absolute_url() + '/@@newsitem-mail?type=plain')
+    >>> print browser.contents
+    >>> browser.open(news.first.absolute_url() + '/@@newsitem-mail?type=subject')
+    >>> print browser.contents
+    Newsflash: First News
+
+Now we publish the news item::
+
     >>> browser.open(news.first.absolute_url())
     >>> browser.getLink('Publish').click()
 
@@ -116,4 +132,44 @@ We have to watchers, so two emails are sent::
     Date: ...
     <BLANKLINE>
     <p>Have I got news for <em>you</em>!</p>
+    >>> self.portal.MailHost.reset()
+
+To test possible problems with non-ascii characters, we have prepared
+another mail and we check this is the browser again::
+
+    >>> browser.open(news.first.absolute_url() + '/@@i18n-mail')
+    >>> print browser.contents
+    >>> browser.open(news.first.absolute_url() + '/@@i18n-mail?type=plain')
+    >>> browser.contents
+    'Breaking \xefnt\xe9rn\xe4ti\xf3nal news: First News'
+
+We have not specified a subject::
+
+    >>> browser.open(news.first.absolute_url() + '/@@i18n-mail?type=subject')
+    >>> print browser.contents
+    [No subject]
+
+Just for laughs we have registered an event handler that sends this
+mail when an object is modified that has 'i18n' in its title; let's
+trigger that manually or better, by editing::
+
+    >>> browser.open(news.first.absolute_url() + '/edit')
+    >>> open('/tmp/test.html', 'w').write(browser.contents)
+    >>> browser.getControl(name='title').value = 'First i18n news'
+    >>> browser.getControl('Save').click()
+    >>> len(self.portal.MailHost.messages)
+    2
+
+Note the different charset and encoding::
+
+    >>> print self.portal.MailHost.messages[0]
+    Content-Type: text/plain; charset="utf-8"
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: quoted-printable
+    Subject: =?utf-8?q?=5BNo_subject=5D?=
+    To: guido@example.com
+    From: admin@example.com
+    Date: ...
+    <BLANKLINE>
+    Breaking =EFnt=E9rn=E4ti=F3nal news: First i18n news
     >>> self.portal.MailHost.reset()
