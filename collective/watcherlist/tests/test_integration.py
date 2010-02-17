@@ -2,8 +2,6 @@ import unittest
 
 from Acquisition import aq_base
 from zope.testing import doctest
-from zope.testing import doctestunit
-from zope.component import testing
 from zope.component import getSiteManager
 from Testing import ZopeTestCase as ztc
 
@@ -114,22 +112,6 @@ class FunctionalTestCase(TestCase, ptc.FunctionalTestCase):
 
 def test_suite():
     return unittest.TestSuite([
-
-        # Unit tests
-        doctestunit.DocFileSuite(
-            'README.txt', package='collective.watcherlist',
-            setUp=testing.setUp, tearDown=testing.tearDown,
-            optionflags=OPTIONFLAGS),
-
-        #doctestunit.DocTestSuite(
-        #    module='collective.watcherlist.mymodule',
-        #    setUp=testing.setUp, tearDown=testing.tearDown),
-
-
-        # Integration tests that use PloneTestCase
-        #ztc.ZopeDocFileSuite(
-        #    'README.txt', package='collective.watcherlist',
-        #    test_class=TestCase),
 
         ztc.FunctionalDocFileSuite(
             'newsletter.txt', package='collective.watcherlist.sample',
