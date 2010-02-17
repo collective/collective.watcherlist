@@ -35,7 +35,7 @@ We take care to let the watchers always be a PersistentList::
   >>> type(wl.watchers)
   <class 'persistent.list.PersistentList'>
 
-Same for extra_addresses::
+The extra_addresses should also be persistent::
 
   >>> wl.extra_addresses
   []
@@ -148,3 +148,34 @@ Now toggle watching as authenticated member::
   ['joe@example.org', 'mary@example.org', 'pete']
   >>> wl.addresses
   ('list@example.org', 'mary@example.org', 'pete@example.org', 'joe@example.org')
+  >>> wl.toggle_watching()
+  >>> wl.watchers
+  ['joe@example.org', 'mary@example.org']
+  >>> wl.addresses
+  ('list@example.org', 'mary@example.org', 'joe@example.org')
+
+In Products.Poi the issues have their own 'watchers' field.  This
+returns a tuple instead of a list.  We respect that::
+
+  >>> class PoiLikeWatcherList(WatcherList):
+  ...     _watchers = tuple()
+  ...     def __get_watchers(self):
+  ...         return self._watchers
+  ...     def __set_watchers(self, v):
+  ...         self._watchers = v
+  ...     watchers = property(__get_watchers, __set_watchers)
+  >>> dummy2 = Dummy()
+  >>> poilist = PoiLikeWatcherList(dummy2)
+  >>> poilist.watchers
+  ()
+  >>> dummy2.portal_membership = memship
+  >>> poilist.toggle_watching()
+  >>> poilist.watchers
+  ('pete',)
+  >>> poilist.addresses
+  ('pete@example.org',)
+  >>> poilist.toggle_watching()
+  >>> poilist.watchers
+  ()
+  >>> poilist.addresses
+  ()
