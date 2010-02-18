@@ -99,15 +99,6 @@ class WatcherList(object):
 
     send_emails = property(__get_send_emails, __set_send_emails)
 
-    def getDefaultContactEmail(self):
-        """Get the default email address, that of the creating user.
-
-        Taken from PoiIssue, but heavily adapted.
-
-        XXX See extra_addresses
-        """
-        return get_member_email()
-
     def toggle_watching(self):
         """Add or remove the current authenticated member from the watchers.
 
@@ -148,29 +139,6 @@ class WatcherList(object):
         if member is None:
             return False
         return member.getId() in self.watchers
-
-    def validate_watchers(self, value=None):
-        """Make sure watchers are actual user ids.
-
-        Email addresses would be fine too actually.
-
-        XXX Not sure if we want to keep this method.
-
-        Taken from PoiIssue.
-        """
-        if value is None:
-            value = self.watchers
-        membership = getToolByName(self.context, 'portal_membership')
-        notFound = []
-        for userId in value:
-            member = membership.getMemberById(userId)
-            if member is None:
-                notFound.append(userId)
-        if notFound:
-            return "The following user ids could not be found: %s" % \
-                ','.join(notFound)
-        else:
-            return None
 
     @property
     def addresses(self):
