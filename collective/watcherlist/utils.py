@@ -13,19 +13,25 @@ from Products.CMFPlone.utils import safe_unicode
 from zope.app.component.hooks import getSite
 from zope.component import getMultiAdapter
 
+DEFAULT_CHARSET = 'utf-8'
+
 
 def get_charset():
     """Character set to use for encoding the email.
 
     If encoding fails we will try some other encodings.  We hope
     to get utf-8 here always actually.
+
+    The getSiteEncoding call also works when portal is None, falling
+    back to utf-8.  But that is only on Plone 4, not Plone 3.  So we
+    handle that ourselves.
     """
     charset = None
     portal = getSite()
-    if portal is not None:
-        charset = portal.getProperty('email_charset', '')
+    if portal is None:
+        return DEFAULT_CHARSET
+    charset = portal.getProperty('email_charset', '')
     if not charset:
-        # This works when portal is None as well, falling back to utf-8.
         charset = getSiteEncoding(portal)
     return charset
 

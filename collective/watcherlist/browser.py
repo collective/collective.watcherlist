@@ -73,8 +73,8 @@ class BaseMail(BrowserView):
             else:
                 break
         # Encoding should work now; let's replace errors just in case.
-        plain.encode(body_charset, 'replace')
-        html.encode(body_charset, 'xmlcharrefreplace')
+        plain = plain.encode(body_charset, 'replace')
+        html = html.encode(body_charset, 'xmlcharrefreplace')
 
         text_part = MIMEText(plain, 'plain', body_charset)
         html_part = MIMEText(html, 'html', body_charset)

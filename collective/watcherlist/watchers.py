@@ -42,9 +42,10 @@ class WatcherList(object):
         annotations = IAnnotations(self.context)
         self.__mapping = annotations.get(self.ANNO_KEY, None)
         if self.__mapping is None:
-            self.__mapping = PersistentDict(
+            info = dict(
                 watchers=PersistentList(),
                 extra_addresses=PersistentList())
+            self.__mapping = PersistentDict(info)
             annotations[self.ANNO_KEY] = self.__mapping
 
     def __get_watchers(self):
@@ -240,6 +241,6 @@ class WatcherList(object):
         message = mail_content.prepare_email_message()
         if not message:
             logger.warn("Not sending empty email.")
-            return            
+            return
         subject = mail_content.subject
         simple_send_mail(message, addresses, subject)
