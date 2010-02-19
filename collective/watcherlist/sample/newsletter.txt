@@ -208,3 +208,19 @@ The resulting email is slightly different, but still basically the same::
     Breaking =C3=AFnt=C3=A9rn=C3=A4ti=C3=B3nal news: First i18n news
     >>> self.portal.MailHost.reset()
     >>> collective.watcherlist.mailer.USE_SECURE_SEND = ori_USE_SECURE_SEND
+
+We do the last edit another time and first unconfigure the MailHost,
+to see if this indeed prevents sending emails (it will print the mail
+for debugging purposes)::
+
+    >>> ori_smtp_host = self.portal.MailHost.smtp_host
+    >>> self.portal.MailHost.smtp_host = ''
+    >>> browser.open(news.first.absolute_url() + '/edit')
+    >>> browser.getControl('Save').click()
+    Subject = [No subject]
+    Addresses = ('guido@example.com', 'testuser@example.com')
+    Message =
+    ...
+    >>> len(self.portal.MailHost.messages)
+    0
+    >>> self.portal.MailHost.smtp_host = ori_smtp_host

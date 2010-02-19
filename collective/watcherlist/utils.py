@@ -1,10 +1,8 @@
 try:
-    from email.utils import parseaddr
-    from email.utils import formataddr
+    from email.utils import parseaddr, formataddr
 except ImportError:
-    # BBB for python2.4 if we want that.
-    from email.Utils import parseaddr
-    from email.Utils import formataddr
+    # BBB for python2.4 (Plone 3)
+    from email.Utils import parseaddr, formataddr
 
 from AccessControl import Unauthorized
 from Products.CMFCore.utils import getToolByName
@@ -54,10 +52,9 @@ def get_mail_host():
     ctrlOverview = getMultiAdapter((portal, request),
                                    name='overview-controlpanel')
     mail_settings_correct = not ctrlOverview.mailhost_warning()
-    if not mail_settings_correct:
-        return None
-    mail_host = getToolByName(portal, 'MailHost', None)
-    return mail_host
+    if mail_settings_correct:
+        mail_host = getToolByName(portal, 'MailHost', None)
+        return mail_host
 
 
 def get_mail_from_address():
