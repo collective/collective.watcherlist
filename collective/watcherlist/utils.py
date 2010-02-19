@@ -62,6 +62,8 @@ def get_mail_host():
 
 def get_mail_from_address():
     portal = getSite()
+    if portal is None:
+        return ''
     from_address = portal.getProperty('email_from_address', '')
     from_name = portal.getProperty('email_from_name', '')
     mfrom = formataddr((from_name, from_address))
@@ -88,7 +90,7 @@ def get_member_email(username=None, portal_membership=None):
         portal = getSite()
         portal_membership = getToolByName(portal, 'portal_membership', None)
         if portal_membership is None:
-            # unit test of non-CMF site
+            # unit test or non-CMF site
             return None
 
     if username is None:

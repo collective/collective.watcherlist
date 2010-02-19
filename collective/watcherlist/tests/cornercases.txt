@@ -179,3 +179,93 @@ returns a tuple instead of a list.  We respect that::
   ()
   >>> poilist.addresses
   ()
+
+Let's test some utility functions a bit more.  Get a safe unicode
+version of a string or return unchanged; basically a small shim around
+safe_unicode from Plone, with the default charset set correctly::
+
+  >>> from collective.watcherlist.utils import su
+  >>> su(None)
+  >>> su("hi")
+  u'hi'
+  >>> su(u"hi")
+  u'hi'
+
+Get the email of a member, with a few fallbacks::
+
+  >>> from collective.watcherlist.utils import get_member_email
+  >>> get_member_email(None, memship)
+  'pete@example.org'
+  >>> get_member_email('ann', memship)
+  'ann@example.org'
+  >>> get_member_email('no-one', memship)
+  >>> get_member_email('address@example.com', memship)
+  'address@example.com'
+
+Allegedly, CMFMember can give some problems, so we check it::
+
+  >>> from AccessControl import Unauthorized
+  >>> class MockField(object):
+  ...     def getAccessor(self, instance):
+  ...         return lambda: instance.username + '@example.org'
+  >>> class MockCMFMember(MockMember):
+  ...     def getProperty(self, propname):
+  ...         if propname == 'email':
+  ...             raise Unauthorized
+  ...     def getField(self, name):
+  ...         if name == 'email':
+  ...             return MockField()
+  >>> memship.members.append(MockCMFMember('cmf'))
+  >>> get_member_email('cmf', memship)
+  'cmf@example.org'
+
+Mock another mail host, so we can test some corner cases in mailer.py::
+
+  >>> from smtplib import SMTPException
+  >>> class MockSillyMailHost(object):
+  ...     def send(self, message, **kwargs):
+  ...         if 'error' in message:
+  ...             raise AttributeError
+  ...         print "Sending mail, SMTPException caught."
+  ...         raise SMTPException
+  ...     secureSend = send
+  >>> silly_host = MockSillyMailHost()
+  >>> from collective.watcherlist import utils
+  >>> utils.get_mail_host()
+  >>> ori_get_mail_host = utils.get_mail_host
+  >>> def get_silly_mail_host():
+  ...     return silly_host
+  >>> utils.get_mail_host = get_silly_mail_host
+  >>> utils.get_mail_host()
+  <MockSillyMailHost object at ...>
+
+Now some mail tests.  Nothing is sent without addresses::
+
+  >>> from collective.watcherlist.mailer import simple_send_mail
+  >>> simple_send_mail('message', [], 'subject')
+
+Empty address are ignored::
+
+  >>> simple_send_mail('message', ['', None, 0, (), []], 'subject')
+
+When an SMTPException is raised, we log it and continue with the next
+address::
+
+  >>> simple_send_mail('message', ['a@example.com', 'b@example.com'], 'subject')
+  Sending mail, SMTPException caught.
+  Sending mail, SMTPException caught.
+
+Other exceptions are reraised::
+
+  >>> simple_send_mail('error message', ['a@example.com'], 'subject')
+  Traceback (most recent call last):
+  ...
+  AttributeError
+
+Restore original method::
+
+  >>> utils.get_mail_host()
+  <MockSillyMailHost object at ...>
+  >>> utils.get_mail_host = ori_get_mail_host
+  >>> utils.get_mail_host() is None
+  True
