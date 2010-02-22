@@ -41,7 +41,9 @@ Basic integration steps
 In its simplest form, the integration that is needed, is this:
 
 - Register an adapter from your content type to
-  ``collective.watcherlist.watchers.WatcherList``
+  ``collective.watcherlist.interfaces.IWatcherList``.  In a lot of
+  cases using the default implementation as factory for this adapter
+  is fine: ``collective.watcherlist.watchers.WatcherList``
 
 - Create an html form where people can add themselves to the watcher
   list.
