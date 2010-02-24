@@ -108,40 +108,47 @@ Now we publish the news item::
     >>> browser.open(news.first.absolute_url())
     >>> browser.getLink('Publish').click()
 
-We have to watchers, so two emails are sent::
+We have to watchers, so two emails are sent.  There are some minor
+differences in the way the SecureMailHost in Plone 3 and the MailHost
+in Plone 4 create the email.  So we do some tricks to only check the
+most important parts of the mail, where we do not care about the
+order::
 
     >>> len(self.portal.MailHost.messages)
     2
-    >>> print self.portal.MailHost.messages[0]
-    MIME-Version: 1.0
-    Content-Type: text/html; charset="us-ascii"
-    Content-Transfer-Encoding: 7bit
-    Subject: =?utf-8?q?Newsflash=3A_First_News?=
-    To: guido@example.com
-    From: admin@example.com
-    Date: ...
+    >>> mail = sorted(str(self.portal.MailHost.messages[0]).splitlines())
+    >>> print '\n'.join(mail)
     <BLANKLINE>
     <p>Have I got news for <em>you</em>!</p>
-    >>> print self.portal.MailHost.messages[1]
-    MIME-Version: 1.0
-    Content-Type: text/html; charset="us-ascii"
     Content-Transfer-Encoding: 7bit
-    Subject: =?utf-8?q?Newsflash=3A_First_News?=
-    To: testuser@example.com
-    From: admin@example.com
+    Content-Type: text/html; charset="us-ascii"
     Date: ...
+    From:...admin@example...
+    ...
+    Subject:...Newsflash...First...
+    To: guido@example...
+    >>> mail = sorted(str(self.portal.MailHost.messages[1]).splitlines())
+    >>> print '\n'.join(mail)
     <BLANKLINE>
     <p>Have I got news for <em>you</em>!</p>
+    Content-Transfer-Encoding: 7bit
+    Content-Type: text/html; charset="us-ascii"
+    Date: ...
+    From:...admin@example...
+    ...
+    Subject:...Newsflash...First...
+    To: testuser@example...
     >>> self.portal.MailHost.reset()
 
 To test possible problems with non-ascii characters, we have prepared
-another mail and we check this is the browser again::
+another mail and we check this is the browser again; depending on
+which mailhost version is used, the result can be slightly different::
 
     >>> browser.open(news.first.absolute_url() + '/@@i18n-mail')
     >>> print browser.contents
     >>> browser.open(news.first.absolute_url() + '/@@i18n-mail?type=plain')
-    >>> browser.contents
-    'Breaking \xefnt\xe9rn\xe4ti\xf3nal news: First News'
+    >>> browser.contents == 'Breaking \xefnt\xe9rn\xe4ti\xf3nal news: First News' or browser.contents == 'Breaking \xc3\xafnt\xc3\xa9rn\xc3\xa4ti\xc3\xb3nal news: First News'
+    True
 
 We have not specified a subject::
 
@@ -160,27 +167,29 @@ trigger that manually or better, by editing::
     2
 
 Note the different charset and encoding::
-
-    >>> print self.portal.MailHost.messages[0]
-    Content-Type: text/plain; charset="utf-8"
-    MIME-Version: 1.0
-    Content-Transfer-Encoding: quoted-printable
-    Subject: =?utf-8?q?=5BNo_subject=5D?=
-    To: guido@example.com
-    From: admin@example.com
-    Date: ...
+ 
+    >>> mail = sorted(str(self.portal.MailHost.messages[0]).splitlines())
+    >>> print '\n'.join(mail)
     <BLANKLINE>
-    Breaking =C3=AFnt=C3=A9rn=C3=A4ti=C3=B3nal news: First i18n news
+    ...
+    Content-Type: text/plain; charset="utf-8"
+    Date: ...
+    From:...admin@example...
+    ...
+    Subject:...No...subject...
+    To: guido@example...
+    >>> 'QnJlYWtpbmcgw69udMOpcm7DpHRpw7NuYWwgbmV3czogRmlyc3QgaTE4biBuZXdz' in mail or 'Breaking =C3=AFnt=C3=A9rn=C3=A4ti=C3=B3nal news: First i18n news' in mail
+    True
     >>> self.portal.MailHost.reset()
 
 With Zope 2.12.3 or higher we know that we can use the normal ``send``
 method of the MailHost, but otherwise the secureSend method is better.
 We do want to try both in the tests, if possible.  But on Plone 3 you
 should just always use secureSend; in our code you even get a
-TypeError if you do not use it, as the send method does not yet accept
-the 'immediate' argument we pass it.  We can at least force using
-secureSend once here and restore the original setting when we are
-done.
+TypeError if you do not use it, because the send method does not yet
+accept the 'immediate' argument we pass it.  We can at least force
+using secureSend once here and restore the original setting when we
+are done.
 
     >>> import collective.watcherlist.mailer
     >>> ori_USE_SECURE_SEND = collective.watcherlist.mailer.USE_SECURE_SEND
@@ -195,17 +204,16 @@ The resulting email is slightly different, but still basically the same::
 
     >>> len(self.portal.MailHost.messages)
     2
-    >>> print self.portal.MailHost.messages[0]
-    Content-Type: text/plain; charset="utf-8"
-    MIME-Version: 1.0
-    Content-Transfer-Encoding: quoted-printable
-    CC:
-    To: guido@example.com
-    BCC:
-    From: admin@example.com
-    Subject: [No subject]
+    >>> mail = sorted(str(self.portal.MailHost.messages[0]).splitlines())
+    >>> print '\n'.join(mail)
     <BLANKLINE>
-    Breaking =C3=AFnt=C3=A9rn=C3=A4ti=C3=B3nal news: First i18n news
+    ...
+    From:...admin@example...
+    ...
+    Subject:...No subject...
+    To: guido@example...
+    >>> 'Breaking =C3=AFnt=C3=A9rn=C3=A4ti=C3=B3nal news: First i18n news' in mail or 'QnJlYWtpbmcgw69udMOpcm7DpHRpw7NuYWwgbmV3czogRmlyc3QgaTE4biBuZXdz' in mail
+    True
     >>> self.portal.MailHost.reset()
     >>> collective.watcherlist.mailer.USE_SECURE_SEND = ori_USE_SECURE_SEND
 
