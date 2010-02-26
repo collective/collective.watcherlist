@@ -185,23 +185,28 @@ class WatcherList(object):
 
         return tuple(addresses)
 
-    def send(self, view_name, **kw):
+    def send(self, view_name, only_these_addresses=None, **kw):
         """Send mail to our addresses using browser view 'view_name'.
 
         view_name is the name of a browser view for the context.  We
         use that to get the contents and subject of the email.
 
+        only_these_addresses is a list of addresses; this forces
+        sending only to those addresses and ignoring all others.
+
         Any keyword arguments will be passed along to the update
         method of that view.
-
-        XXX Perhaps allow passing only_these_addresses=[...] to force
-        sending only to those addresses and ignoring all others.
         """
         context = aq_inner(self.context)
-        addresses = self.addresses
+        if only_these_addresses is None:
+            addresses = self.addresses
+        else:
+            addresses = only_these_addresses
         if not addresses:
             logger.info("No addresses found.")
             return
+        if isinstance(addresses, basestring):
+            addresses = [addresses]
 
         request = context.REQUEST
         mail_content = getMultiAdapter((context, request), name=view_name)
