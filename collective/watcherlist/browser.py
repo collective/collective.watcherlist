@@ -61,6 +61,10 @@ class BaseMail(BrowserView):
         if not plain and not html:
             return None
 
+        # We definitely want unicode at this point.
+        plain = utils.su(plain)
+        html = utils.su(html)
+
         # We must choose the body charset manually.  Note that the
         # goal and effect of this loop is to determine the
         # body_charset.
@@ -68,7 +72,7 @@ class BaseMail(BrowserView):
             try:
                 plain.encode(body_charset)
                 html.encode(body_charset)
-            except UnicodeError:
+            except UnicodeEncodeError:
                 pass
             else:
                 break

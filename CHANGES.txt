@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.2 (unreleased)
+----------------
+
+- Fixed possible UnicodeDecodeError when the plain text or html part
+  of the email was not unicode.
+  [maurits]
+
+
 0.1 (2010-02-26)
 ----------------
 
