@@ -46,7 +46,8 @@ In its simplest form, the integration that is needed, is this:
   is fine: ``collective.watcherlist.watchers.WatcherList``
 
 - Create an html form where people can add themselves to the watcher
-  list.
+  list.  This could also be PloneFormGen form with a custom script
+  adapter as action.
 
 - Register a BrowserView for your content type, inheriting from
   ``collective.watcherlist.browser.BaseMail`` and override its
