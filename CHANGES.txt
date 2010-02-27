@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.2 (unreleased)
+0.2 (2010-02-27)
 ----------------
 
 - You can now add ``only_these_addresses`` as an argument to the send
