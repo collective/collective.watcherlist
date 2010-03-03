@@ -89,11 +89,12 @@ watcherlist as provided by the package::
   >>> sm = getGlobalSiteManager()
   >>> sm.registerAdapter(WatcherList, (Party, ))
 
-This documentation doubles as automated test, so we run into a test
-detail here: the WatcherList adapter stores the watchers in an
-annotation, so we need to tell the ZCA how to do that; for standard
-Plone/Archetypes content types this is already done, so you usually do
-not need to care about this::
+.. This documentation doubles as automated test, so we run into a test
+.. detail here: the WatcherList adapter stores the watchers in an
+.. annotation, so we need to tell the ZCA how to do that; for standard
+.. Plone/Archetypes content types this is already done, so you usually do
+.. not need to care about this.  Oh, we can hide this, nice::
+  :hide:
 
   >>> from zope.annotation.interfaces import IAnnotations
   >>> from zope.annotation.attribute import AttributeAnnotations
