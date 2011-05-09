@@ -2,6 +2,8 @@ import logging
 from smtplib import SMTPException
 import pkg_resources
 import socket
+from Products.MailHost.MailHost import MailHostError
+
 from collective.watcherlist import utils
 
 logger = logging.getLogger('collective.watcherlist')
@@ -66,7 +68,7 @@ def simple_send_mail(message, addresses, subject, immediate=True):
                                subject=subject,
                                immediate=immediate,
                                charset=header_charset)
-        except (socket.error, SMTPException):
+        except (socket.error, SMTPException, MailHostError):
             logger.warn('Could not send email to %s with subject %s',
                         address, subject)
         except:

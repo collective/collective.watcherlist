@@ -4,7 +4,8 @@ Changelog
 0.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Catch MailHostErrors when sending email.
+  [maurits]
 
 
 0.2 (2010-02-27)
