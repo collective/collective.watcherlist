@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 readme = open(os.path.join('collective', 'watcherlist', 'README.txt')).read()
 
-version = '0.3dev'
+version = '0.3'
 
 setup(name='collective.watcherlist',
       version=version,
