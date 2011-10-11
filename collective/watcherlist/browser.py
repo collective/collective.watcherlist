@@ -50,6 +50,9 @@ class BaseMail(BrowserView):
         """
         type_ = self.request.get('type', '')
         if type_ == 'plain':
+            # This may be a page template, but we want it to be
+            # visible as plain text in the browser always.
+            self.request.response.setHeader('content-type', 'text/plain')
             return self.plain
         elif type_ == 'subject':
             return self.subject

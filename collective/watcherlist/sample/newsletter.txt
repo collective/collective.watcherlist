@@ -149,6 +149,8 @@ which mailhost version is used, the result can be slightly different::
     >>> browser.open(news.first.absolute_url() + '/@@i18n-mail?type=plain')
     >>> browser.contents == 'Breaking \xefnt\xe9rn\xe4ti\xf3nal news: First News' or browser.contents == 'Breaking \xc3\xafnt\xc3\xa9rn\xc3\xa4ti\xc3\xb3nal news: First News'
     True
+    >>> browser.headers.gettype()
+    'text/plain'
 
 We have not specified a subject::
 

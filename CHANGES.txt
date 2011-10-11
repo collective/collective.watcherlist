@@ -4,7 +4,9 @@ Changelog
 0.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- When showing the plain text in the browser as test, force text/plain
+  as content-type.
+  [maurits]
 
 
 0.3 (2011-05-09)
