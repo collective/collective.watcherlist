@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.4 (unreleased)
+0.4 (2012-04-21)
 ----------------
 
 - When showing the plain text in the browser as test, force text/plain
