@@ -1,7 +1,6 @@
 import unittest
 
-from zope.testing import doctest
-from zope.testing import doctestunit
+import doctest
 from zope.component import testing
 
 OPTIONFLAGS = (doctest.ELLIPSIS |
@@ -12,12 +11,12 @@ def test_suite():
     return unittest.TestSuite([
 
         # Unit tests
-        doctestunit.DocFileSuite(
+        doctest.DocFileSuite(
             'README.txt', package='collective.watcherlist',
             setUp=testing.setUp, tearDown=testing.tearDown,
             optionflags=OPTIONFLAGS),
 
-        doctestunit.DocFileSuite(
+        doctest.DocFileSuite(
             'cornercases.txt', package='collective.watcherlist.tests',
             setUp=testing.setUp, tearDown=testing.tearDown,
             optionflags=OPTIONFLAGS),

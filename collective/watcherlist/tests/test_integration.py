@@ -1,11 +1,15 @@
 import unittest
 
 from Acquisition import aq_base
-from zope.testing import doctest
+import doctest
 from zope.component import getSiteManager
 from Testing import ZopeTestCase as ztc
 
-from Products.Five import zcml
+try:
+    from Zope2.App import zcml
+    zcml  # pyflakes
+except ImportError:
+    from Products.Five import zcml
 from Products.Five import fiveconfigure
 from Products.MailHost.interfaces import IMailHost
 from Products.PloneTestCase import PloneTestCase as ptc
@@ -84,7 +88,11 @@ class FunctionalTestCase(TestCase, ptc.FunctionalTestCase):
         self.addMember('reinout', 'Reinout van Rees', 'reinout@example.com')
 
         # Setup test browser:
-        from Products.Five.testbrowser import Browser
+        try:
+            from Testing.testbrowser import Browser
+            Browser  # pyflakes
+        except ImportError:
+            from Products.Five.testbrowser import Browser
         self.browser = Browser()
         self.browser.handleErrors = False
         self.browser.addHeader('Accept-Language', 'en-US')
