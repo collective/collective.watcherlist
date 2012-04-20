@@ -18,13 +18,13 @@
       factory="collective.watcherlist.watchers.WatcherList"
       />
 
-  <subscriber 
+  <subscriber
       for="Products.ATContentTypes.interface.IATContentType
            Products.DCWorkflow.interfaces.IAfterTransitionEvent"
       handler=".eventhandlers.mail_news"
       />
 
-  <subscriber 
+  <subscriber
       for="Products.Archetypes.interfaces.IBaseContent
            zope.lifecycleevent.interfaces.IObjectModifiedEvent"
       handler=".eventhandlers.mail_i18n"
