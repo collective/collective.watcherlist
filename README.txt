@@ -1,1 +1,1 @@
-See collective/watcherlist/README.txt.
+See collective/watcherlist/README.rst.

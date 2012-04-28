@@ -2,7 +2,7 @@ Testing corner cases
 ====================
 
 Let's test some corner cases here that would otherwise clutter the
-README.txt too much.
+README.rst too much.
 
 First some setup::
 

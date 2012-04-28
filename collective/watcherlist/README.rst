@@ -46,7 +46,7 @@ In its simplest form, the integration that is needed, is this:
   is fine: ``collective.watcherlist.watchers.WatcherList``
 
 - Create an html form where people can add themselves to the watcher
-  list.  This could also be PloneFormGen form with a custom script
+  list.  This could also be PloneFormGen_ form with a custom script
   adapter as action.
 
 - Register a BrowserView for your content type, inheriting from
@@ -256,3 +256,4 @@ Look at Products.Poi_ for some more examples of what you can do.
 
 .. _Products.Poi: http://plone.org/products/poi
 .. _`Singing and Dancing`: http://plone.org/products/dancing
+.. _PloneFormGen: http://plone.org/products/ploneformgen
