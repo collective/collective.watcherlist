@@ -12,7 +12,7 @@ def test_suite():
 
         # Unit tests
         doctest.DocFileSuite(
-            'README.txt', package='collective.watcherlist',
+            'README.rst', package='collective.watcherlist',
             setUp=testing.setUp, tearDown=testing.tearDown,
             optionflags=OPTIONFLAGS),
 

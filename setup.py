@@ -1,7 +1,7 @@
 import os
 from setuptools import setup, find_packages
 
-readme = open(os.path.join('collective', 'watcherlist', 'README.txt')).read()
+readme = open(os.path.join('collective', 'watcherlist', 'README.rst')).read()
 
 version = '1.1.dev0'
 
