@@ -7,6 +7,9 @@ Changelog
 - Made compatible with Plone 4.3 (keeping compatibility with Plone 3).
   [maurits]
 
+- Moved to https://github.com/collective/collective.watcherlist
+  [maurits]
+
 
 1.0 (2012-04-21)
 ----------------
