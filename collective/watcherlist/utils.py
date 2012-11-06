@@ -8,7 +8,12 @@ from AccessControl import Unauthorized
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import getSiteEncoding
 from Products.CMFPlone.utils import safe_unicode
-from zope.app.component.hooks import getSite
+try:
+    from zope.component.hooks import getSite
+    # getSite
+except ImportError:
+    # BBB for Plone 3
+    from zope.app.component.hooks import getSite
 from zope.component import getMultiAdapter
 
 DEFAULT_CHARSET = 'utf-8'

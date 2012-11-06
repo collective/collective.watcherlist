@@ -4,7 +4,8 @@ Changelog
 1.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Made compatible with Plone 4.3 (keeping compatibility with Plone 3).
+  [maurits]
 
 
 1.0 (2012-04-21)
