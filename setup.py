@@ -9,7 +9,7 @@ setup(name='collective.watcherlist',
       version=version,
       description="Send emails from Plone to interested members (watchers)",
       long_description=readme + "\n" +
-                       open("CHANGES.txt").read(),
+                       open("CHANGES.rst").read(),
       classifiers=[
         "Framework :: Plone",
         "Framework :: Plone :: 3.3",
