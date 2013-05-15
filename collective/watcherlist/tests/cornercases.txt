@@ -73,7 +73,10 @@ We have no Plone Site setup, so no members can watch::
 Let's see if we can mock a portal_membership tool into these tests,
 including mock users::
 
+  >>> from persistent.interfaces import IPersistent
+  >>> from zope.interface import implements
   >>> class MockMemship(object):
+  ...     implements(IPersistent)
   ...     current_member_name = None
   ...     members = []
   ...     def isAnonymousUser(self):
