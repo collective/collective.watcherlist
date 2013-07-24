@@ -124,10 +124,10 @@ class WatcherList(object):
         notify(event.ToggleWatchingEvent)
         if member_id in self.watchers:
             watchers.remove(member_id)
-            notify(event.RemoveFromWatchingEvent)
+            notify(event.RemovedFromWatchingEvent)
         else:
             watchers.append(member_id)
-            notify(event.AddToWatchingEvent)
+            notify(event.AddedToWatchingEvent)
         if as_tuple:
             self.watchers = tuple(watchers)
 

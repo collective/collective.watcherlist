@@ -5,4 +5,24 @@
 
   <five:registerPackage package="." initialize=".initialize" />
 
+  <!-- Triggers -->
+
+  <interface
+      interface=".event.IAddToWatchingEvent"
+      type="plone.contentrules.rule.interfaces.IRuleEventType"
+      name="User added to watchers list"
+      />
+
+  <interface
+      interface=".event.IRemovedFromWatchingEvent"
+      type="plone.contentrules.rule.interfaces.IRuleEventType"
+      name="User removed from watchers list"
+      />
+
+  <interface
+      interface=".event.IToggleWatchingEvent"
+      type="plone.contentrules.rule.interfaces.IRuleEventType"
+      name="User added to or removed from watchers list"
+      />
+
 </configure>

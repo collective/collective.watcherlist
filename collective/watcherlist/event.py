@@ -3,7 +3,7 @@ from zope.component.interfaces import ObjectEvent
 from zope import interface
 
 
-class IAddToWatchingEvent(IObjectEvent):
+class IAddedToWatchingEvent(IObjectEvent):
     """Event for when a user is added to the watchers list."""
 
 
@@ -11,7 +11,7 @@ class AddToWatchingEvent(ObjectEvent):
     interface.implements(IAddToWatchingEvent)
 
 
-class IRemoveFromWatchingEvent(IObjectEvent):
+class IRemovedFromWatchingEvent(IObjectEvent):
     """Event for when a user is removed from the watchers list."""
 
 
