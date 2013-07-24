@@ -8,7 +8,7 @@ class IAddedToWatchingEvent(IObjectEvent):
 
 
 class AddToWatchingEvent(ObjectEvent):
-    interface.implements(IAddToWatchingEvent)
+    interface.implements(IAddedToWatchingEvent)
 
 
 class IRemovedFromWatchingEvent(IObjectEvent):
@@ -16,7 +16,7 @@ class IRemovedFromWatchingEvent(IObjectEvent):
 
 
 class RemoveFromWatchingEvent(ObjectEvent):
-    interface.implements(IRemoveFromWatchingEvent)
+    interface.implements(IRemovedFromWatchingEvent)
 
 
 class IToggleWatchingEvent(IObjectEvent):

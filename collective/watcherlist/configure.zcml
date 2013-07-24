@@ -10,7 +10,7 @@
   <!-- Triggers -->
 
   <interface
-      interface=".event.IAddToWatchingEvent"
+      interface=".event.IAddedToWatchingEvent"
       type="plone.contentrules.rule.interfaces.IRuleEventType"
       name="User added to watchers list"
       />
