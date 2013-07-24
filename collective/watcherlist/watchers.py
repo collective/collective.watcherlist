@@ -5,12 +5,14 @@ from Products.CMFCore.utils import getToolByName
 from persistent.dict import PersistentDict
 from persistent.list import PersistentList
 from zope.annotation.interfaces import IAnnotations
+from zope.event import notify
 from zope.interface import implements
 import sets
 
 from collective.watcherlist.interfaces import IWatcherList
 from collective.watcherlist.mailer import simple_send_mail
 from collective.watcherlist.utils import get_member_email
+from collective.watcherlist import event
 
 logger = logging.getLogger('collective.watcherlist')
 
@@ -119,10 +121,13 @@ class WatcherList(object):
             as_tuple = True
         else:
             as_tuple = False
+        notify(event.ToggleWatchingEvent)
         if member_id in self.watchers:
             watchers.remove(member_id)
+            notify(event.RemoveFromWatchingEvent)
         else:
             watchers.append(member_id)
+            notify(event.AddToWatchingEvent)
         if as_tuple:
             self.watchers = tuple(watchers)
 
