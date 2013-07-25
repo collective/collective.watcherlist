@@ -4,6 +4,7 @@ from plone.contentrules.rule.interfaces import IRuleElementData, IExecutable
 from Products.CMFPlone import PloneMessageFactory as _p
 from zope.formlib import form
 from zope.component import adapts
+from zope import component
 from zope import interface
 from zope import schema
 
