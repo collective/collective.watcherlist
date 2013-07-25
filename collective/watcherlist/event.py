@@ -7,7 +7,7 @@ class IAddedToWatchingEvent(IObjectEvent):
     """Event for when a user is added to the watchers list."""
 
 
-class AddToWatchingEvent(ObjectEvent):
+class AddedToWatchingEvent(ObjectEvent):
     interface.implements(IAddedToWatchingEvent)
 
 
@@ -15,7 +15,7 @@ class IRemovedFromWatchingEvent(IObjectEvent):
     """Event for when a user is removed from the watchers list."""
 
 
-class RemoveFromWatchingEvent(ObjectEvent):
+class RemovedFromWatchingEvent(ObjectEvent):
     interface.implements(IRemovedFromWatchingEvent)
 
 
