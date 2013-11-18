@@ -43,10 +43,10 @@ class WatchingActionExecutor(object):
         watching = self.element.watching
         obj = self.event.object
         watchers = component.queryAdapter(
-                obj,
-                interface=IWatcherList,
-                name="group_watchers",
-                default=None
+            obj,
+            interface=IWatcherList,
+            name="group_watchers",
+            default=None
             )
         if watching == 'watch' and watchers.isWatching():
             return True
