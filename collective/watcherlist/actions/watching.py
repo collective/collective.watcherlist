@@ -21,11 +21,20 @@ class IWatchingAction(interface.Interface):
         vocabulary=watchingChoice
         )
 
+    name = schema.ASCIILine(
+        title=_(u"Name of your adapter"),
+        description=_(u"Leave that empty if you don't"
+                      u" know what you're doing."),
+        missing_value='',
+        required=False
+        )
+
 
 class WatchingAction(SimpleItem):
     interface.implements(IWatchingAction, IRuleElementData)
 
     watching = 'watch'
+    name = ''
     element = 'collective.watcherlist.actions.Watching'
     summary = _(u'Change if the user is in the watchers list or not.')
 
@@ -41,13 +50,16 @@ class WatchingActionExecutor(object):
 
     def __call__(self):
         watching = self.element.watching
+        name = self.element.name
         obj = self.event.object
         watchers = component.queryAdapter(
             obj,
             interface=IWatcherList,
-            name="group_watchers",
+            name=name,
             default=None
             )
+        if watchers is None:
+            return False
         if watching == 'watch' and watchers.isWatching():
             return True
         if watching == 'unwatch' and not watchers.isWatching():

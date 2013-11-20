@@ -19,6 +19,19 @@ logger = logging.getLogger('collective.watcherlist')
 _marker = object()
 
 
+class WatchersPersistentList(PersistentList):
+    """Personalize PersistentList to throw events on list change."""
+    def append(self, item):
+        super(WatchersPersistentList, self).append(item)
+        notify(event.ToggleWatchingEvent)
+        notify(event.AddedToWatchingEvent)
+
+    def remove(self, item):
+        super(WatchersPersistentList, self).remove(item)
+        notify(event.ToggleWatchingEvent)
+        notify(event.RemovedFromWatchingEvent)
+
+
 class WatcherList(object):
     """Adapter for lists of watchers.
 
@@ -45,7 +58,7 @@ class WatcherList(object):
         self.__mapping = annotations.get(self.ANNO_KEY, None)
         if self.__mapping is None:
             info = dict(
-                watchers=PersistentList(),
+                watchers=WatchersPersistentList(),
                 extra_addresses=PersistentList())
             self.__mapping = PersistentDict(info)
             annotations[self.ANNO_KEY] = self.__mapping
@@ -121,13 +134,10 @@ class WatcherList(object):
             as_tuple = True
         else:
             as_tuple = False
-        notify(event.ToggleWatchingEvent)
         if member_id in self.watchers:
             watchers.remove(member_id)
-            notify(event.RemovedFromWatchingEvent)
         else:
             watchers.append(member_id)
-            notify(event.AddedToWatchingEvent)
         if as_tuple:
             self.watchers = tuple(watchers)
 
