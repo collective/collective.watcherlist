@@ -19,7 +19,7 @@ class IWatchingAction(interface.Interface):
     watching = schema.Choice(
         title=_(u"Change watching"),
         vocabulary=watchingChoice
-        )
+    )
 
     name = schema.ASCIILine(
         title=_(u"Name of your adapter"),

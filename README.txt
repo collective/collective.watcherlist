@@ -57,6 +57,23 @@ In its simplest form, the integration that is needed, is this:
   your content type and uses that to send an email with the subject
   and contents defined in the browser view you created.
 
+Events integration
+==================
+
+This addons play well with zope's event and plone's contentrules.
+It triggers a zope event on all basic actions done on the watcherlist:
+
+* ToggleWatchingEvent
+* RemovedFromWatchingEvent
+* AddedToWatchingEvent
+
+Those events are registred to be useable as content rule trigger so you can
+create a rule based on it.
+
+It also provides a content rule action so you can create an action that's
+add or remove the current user to or from the watcherlist attached to the
+context.
+
 Credits
 =======
 
@@ -64,8 +81,11 @@ People
 ------
 
 * Maurits van Rees [maurits] <maurits@vanrees.org> author
+* Gagaro <gagaro42@gmail.com>
+* JeanMichel FRANCOIS aka toutpt <toutpt@gmail.com>
 
 Companies
 ---------
 
 * Zest Software http://zestsoftware.nl/
+* `Makina Corpus <http://www.makina-corpus.org>`_
