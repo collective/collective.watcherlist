@@ -19,7 +19,7 @@ class IWatchingAction(interface.Interface):
     watching = schema.Choice(
         title=_(u"Change watching"),
         vocabulary=watchingChoice
-        )
+    )
 
 
 class WatchingAction(SimpleItem):
@@ -47,7 +47,7 @@ class WatchingActionExecutor(object):
             interface=IWatcherList,
             name="group_watchers",
             default=None
-            )
+        )
         if watching == 'watch' and watchers.isWatching():
             return True
         if watching == 'unwatch' and not watchers.isWatching():

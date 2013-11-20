@@ -125,7 +125,7 @@ def test_suite():
             'newsletter.txt', package='collective.watcherlist.sample',
             test_class=FunctionalTestCase),
 
-        ])
+    ])
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')

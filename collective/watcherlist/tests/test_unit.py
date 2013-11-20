@@ -21,7 +21,7 @@ def test_suite():
             setUp=testing.setUp, tearDown=testing.tearDown,
             optionflags=OPTIONFLAGS),
 
-        ])
+    ])
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
