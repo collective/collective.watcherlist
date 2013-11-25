@@ -24,7 +24,8 @@ _marker = object()
 class WatchersPersistentList(object):
     """Wrap PersistentList to throw events on list change."""
 
-    def __init__(self, p=None):
+    def __init__(self, context, p=None):
+        self.context = context
         if p is None:
             self._obj = PersistentList()
         elif isinstance(p, PersistentList):
@@ -33,14 +34,14 @@ class WatchersPersistentList(object):
             raise TypeError("Watcher must be a PersistentList")
 
     def __getattribute__(self, name):
-        if name == '_obj':
+        if name in ('_obj', 'context'):
             return object.__getattribute__(self, name)
         if name == 'append' or name == 'insert':
-            notify(event.ToggleWatchingEvent)
-            notify(event.AddedToWatchingEvent)
+            notify(event.ToggleWatchingEvent(self.context))
+            notify(event.AddedToWatchingEvent(self.context))
         elif name == 'pop' or name == 'remove':
-            notify(event.ToggleWatchingEvent)
-            notify(event.RemovedFromWatchingEvent)
+            notify(event.ToggleWatchingEvent(self.context))
+            notify(event.RemovedFromWatchingEvent(self.context))
         return getattr(self._obj, name)
 
     __ignore__ = "class mro new init setattr getattr getattribute"
@@ -94,7 +95,8 @@ class WatcherList(object):
             annotations[self.ANNO_KEY] = self.__mapping
 
     def __get_watchers(self):
-        return WatchersPersistentList(self.__mapping.get('watchers'))
+        return WatchersPersistentList(self.context,
+                                      self.__mapping.get('watchers'))
 
     def __set_watchers(self, v):
         if isinstance(v, WatchersPersistentList):
