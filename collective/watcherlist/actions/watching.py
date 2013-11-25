@@ -27,7 +27,7 @@ class IWatchingAction(interface.Interface):
                       u" know what you're doing."),
         missing_value='',
         required=False
-        )
+    )
 
 
 class WatchingAction(SimpleItem):
@@ -57,7 +57,7 @@ class WatchingActionExecutor(object):
             interface=IWatcherList,
             name=name,
             default=None
-            )
+        )
         if watchers is None:
             return False
         if watching == 'watch' and watchers.isWatching():
