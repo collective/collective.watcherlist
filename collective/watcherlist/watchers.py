@@ -19,17 +19,47 @@ logger = logging.getLogger('collective.watcherlist')
 _marker = object()
 
 
-class WatchersPersistentList(PersistentList):
-    """Personalize PersistentList to throw events on list change."""
-    def append(self, item):
-        super(WatchersPersistentList, self).append(item)
-        notify(event.ToggleWatchingEvent)
-        notify(event.AddedToWatchingEvent)
+# Access magical methods of wrapped object
+# http://stackoverflow.com/a/9059858/2575355
+class WatchersPersistentList(object):
+    """Wrap PersistentList to throw events on list change."""
 
-    def remove(self, item):
-        super(WatchersPersistentList, self).remove(item)
-        notify(event.ToggleWatchingEvent)
-        notify(event.RemovedFromWatchingEvent)
+    def __init__(self, p=None):
+        if p is None:
+            self._obj = PersistentList()
+        elif isinstance(p, PersistentList):
+            self._obj = p
+        else:
+            raise TypeError("Watcher must be a PersistentList")
+
+    def __getattribute__(self, name):
+        if name == '_obj':
+            return object.__getattribute__(self, name)
+        if name == 'append' or name == 'insert':
+            notify(event.ToggleWatchingEvent)
+            notify(event.AddedToWatchingEvent)
+        elif name == 'pop' or name == 'remove':
+            notify(event.ToggleWatchingEvent)
+            notify(event.RemovedFromWatchingEvent)
+        return getattr(self._obj, name)
+
+    __ignore__ = "class mro new init setattr getattr getattribute"
+
+    class __metaclass__(type):
+        def __init__(cls, name, bases, dct):
+
+            def make_proxy(name):
+                def proxy(self, *args):
+                    return getattr(self._obj, name)
+                return proxy
+
+            type.__init__(cls, name, bases, dct)
+
+            ignore = set("__%s__" % n for n in cls.__ignore__.split())
+            for name in dir(list):
+                if name.startswith("__"):
+                    if name not in ignore and name not in dct:
+                        setattr(cls, name, property(make_proxy(name)))
 
 
 class WatcherList(object):
@@ -58,16 +88,18 @@ class WatcherList(object):
         self.__mapping = annotations.get(self.ANNO_KEY, None)
         if self.__mapping is None:
             info = dict(
-                watchers=WatchersPersistentList(),
+                watchers=PersistentList(),
                 extra_addresses=PersistentList())
             self.__mapping = PersistentDict(info)
             annotations[self.ANNO_KEY] = self.__mapping
 
     def __get_watchers(self):
-        return self.__mapping.get('watchers')
+        return WatchersPersistentList(self.__mapping.get('watchers'))
 
     def __set_watchers(self, v):
-        if not isinstance(v, PersistentList):
+        if isinstance(v, WatchersPersistentList):
+            v = v._obj
+        elif not isinstance(v, PersistentList):
             v = PersistentList(v)
         self.__mapping['watchers'] = v
 
@@ -113,6 +145,12 @@ class WatcherList(object):
         self.__mapping['send_emails'] = v
 
     send_emails = property(__get_send_emails, __set_send_emails)
+
+    def append(self, item):
+        self.watchers.append(item)
+
+    def remove(self, item):
+        self.watchers.append(item)
 
     def toggle_watching(self):
         """Add or remove the current authenticated member from the watchers.
