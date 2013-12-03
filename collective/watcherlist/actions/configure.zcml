@@ -1,0 +1,38 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:five="http://namespaces.zope.org/five"
+    >
+
+  <include package="plone.app.contentrules" />
+
+  <adapter factory=".watching.WatchingActionExecutor" />
+
+  <browser:page
+      for="plone.app.contentrules.browser.interfaces.IRuleActionAdding"
+      name="collective.watcherlist.actions.Watching"
+      class=".watching.WatchingActionAddForm"
+      permission="cmf.ManagePortal"
+      />
+
+  <browser:page
+      for="collective.watcherlist.actions.watching.IWatchingAction"
+      name="edit"
+      class=".watching.WatchingActionEditForm"
+      permission="cmf.ManagePortal"
+      />
+
+  <plone:ruleAction
+      name="collective.watcherlist.actions.Watching"
+      title="Add or remove a user from the watchers list."
+      description="Add or remove a user from the watchers list."
+      for="*"
+      event="zope.component.interfaces.IObjectEvent"
+      addview="collective.watcherlist.actions.Watching"
+      editview="edit"
+      schema=".watching.IWatchingAction"
+      factory=".watching.WatchingAction"
+      />
+
+</configure>
