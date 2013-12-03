@@ -5,7 +5,7 @@ readme = open('README.rst').read()
 tests = open(os.path.join('collective', 'watcherlist', 'README.rst')).read()
 changes = open("CHANGES.rst").read()
 
-version = '1.2.dev0'
+version = '1.2'
 
 setup(
     name='collective.watcherlist',
