@@ -19,50 +19,6 @@ logger = logging.getLogger('collective.watcherlist')
 _marker = object()
 
 
-# Access magical methods of wrapped object
-# http://stackoverflow.com/a/9059858/2575355
-class WatchersPersistentList(object):
-    """Wrap PersistentList to throw events on list change."""
-
-    def __init__(self, context, p=None):
-        self.context = context
-        if p is None:
-            self._obj = PersistentList()
-        elif isinstance(p, PersistentList):
-            self._obj = p
-        else:
-            raise TypeError("Watcher must be a PersistentList")
-
-    def __getattribute__(self, name):
-        if name in ('_obj', 'context'):
-            return object.__getattribute__(self, name)
-        if name == 'append' or name == 'insert':
-            notify(event.ToggleWatchingEvent(self.context))
-            notify(event.AddedToWatchingEvent(self.context))
-        elif name == 'pop' or name == 'remove':
-            notify(event.ToggleWatchingEvent(self.context))
-            notify(event.RemovedFromWatchingEvent(self.context))
-        return getattr(self._obj, name)
-
-    __ignore__ = "class mro new init setattr getattr getattribute"
-
-    class __metaclass__(type):
-        def __init__(cls, name, bases, dct):
-
-            def make_proxy(name):
-                def proxy(self, *args):
-                    return getattr(self._obj, name)
-                return proxy
-
-            type.__init__(cls, name, bases, dct)
-
-            ignore = set("__%s__" % n for n in cls.__ignore__.split())
-            for name in dir(list):
-                if name.startswith("__"):
-                    if name not in ignore and name not in dct:
-                        setattr(cls, name, property(make_proxy(name)))
-
-
 class WatcherList(object):
     """Adapter for lists of watchers.
 
@@ -95,13 +51,10 @@ class WatcherList(object):
             annotations[self.ANNO_KEY] = self.__mapping
 
     def __get_watchers(self):
-        return WatchersPersistentList(self.context,
-                                      self.__mapping.get('watchers'))
+        return self.__mapping.get('watchers')
 
     def __set_watchers(self, v):
-        if isinstance(v, WatchersPersistentList):
-            v = v._obj
-        elif not isinstance(v, PersistentList):
+        if not isinstance(v, PersistentList):
             v = PersistentList(v)
         self.__mapping['watchers'] = v
 
@@ -149,10 +102,14 @@ class WatcherList(object):
     send_emails = property(__get_send_emails, __set_send_emails)
 
     def append(self, item):
+        notify(event.ToggleWatchingEvent(self.context))
+        notify(event.AddedToWatchingEvent(self.context))
         self.watchers.append(item)
 
     def remove(self, item):
-        self.watchers.append(item)
+        notify(event.ToggleWatchingEvent(self.context))
+        notify(event.RemovedFromWatchingEvent(self.context))
+        self.watchers.remove(item)
 
     def toggle_watching(self):
         """Add or remove the current authenticated member from the watchers.
@@ -175,8 +132,12 @@ class WatcherList(object):
         else:
             as_tuple = False
         if member_id in self.watchers:
+            notify(event.ToggleWatchingEvent(self.context))
+            notify(event.RemovedFromWatchingEvent(self.context))
             watchers.remove(member_id)
         else:
+            notify(event.ToggleWatchingEvent(self.context))
+            notify(event.AddedToWatchingEvent(self.context))
             watchers.append(member_id)
         if as_tuple:
             self.watchers = tuple(watchers)

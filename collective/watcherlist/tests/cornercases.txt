@@ -28,12 +28,12 @@ We take care to let the watchers always be a PersistentList::
   >>> wl.watchers
   []
   >>> type(wl.watchers)
-  <class 'collective.watcherlist.watchers.WatchersPersistentList'>
+  <class 'persistent.list.PersistentList'>
   >>> wl.watchers = ['joe@example.org', 'mary@example.org']
   >>> wl.watchers
   ['joe@example.org', 'mary@example.org']
   >>> type(wl.watchers)
-  <class 'collective.watcherlist.watchers.WatchersPersistentList'>
+  <class 'persistent.list.PersistentList'>
 
 The extra_addresses should also be persistent::
 
