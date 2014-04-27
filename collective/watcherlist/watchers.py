@@ -1,18 +1,20 @@
-import logging
-from zope.component import getMultiAdapter
-from Acquisition import aq_inner, aq_parent
-from Products.CMFCore.utils import getToolByName
-from persistent.dict import PersistentDict
-from persistent.list import PersistentList
-from zope.annotation.interfaces import IAnnotations
-from zope.event import notify
-from zope.interface import implements
-import sets
-
+from Acquisition import aq_inner
+from Acquisition import aq_parent
+from collective.watcherlist import event
 from collective.watcherlist.interfaces import IWatcherList
 from collective.watcherlist.mailer import simple_send_mail
 from collective.watcherlist.utils import get_member_email
-from collective.watcherlist import event
+from persistent.dict import PersistentDict
+from persistent.list import PersistentList
+from plone import api
+from plone.api.exc import CannotGetPortalError
+from zope.annotation.interfaces import IAnnotations
+from zope.component import getMultiAdapter
+from zope.event import notify
+from zope.interface import implements
+
+import logging
+import sets
 
 logger = logging.getLogger('collective.watcherlist')
 
@@ -118,8 +120,10 @@ class WatcherList(object):
 
         If the current value is a tuple, we keep it that way.
         """
-        memship = getToolByName(self.context, 'portal_membership', None)
-        if memship is None:
+        try:
+            memship = api.portal.get_tool('portal_membership')
+        except CannotGetPortalError:
+            # unit test or non-CMF site
             return
         if memship.isAnonymousUser():
             return
@@ -148,8 +152,10 @@ class WatcherList(object):
 
         Taken from PoiIssue.
         """
-        memship = getToolByName(self.context, 'portal_membership', None)
-        if memship is None:
+        try:
+            memship = api.portal.get_tool('portal_membership')
+        except CannotGetPortalError:
+            # unit test or non-CMF site
             return False
         member = memship.getAuthenticatedMember()
         if member is None:
@@ -177,8 +183,9 @@ class WatcherList(object):
         addresses = sets.Set()
 
         context = aq_inner(self.context)
-        memship = getToolByName(context, 'portal_membership', None)
-        if memship is None:
+        try:
+            memship = api.portal.get_tool('portal_membership')
+        except CannotGetPortalError:
             # Okay, either we are in a simple unit test, or someone is
             # using this package outside of CMF/Plone.  We should
             # assume the watchers are simple email addresses.

@@ -31,8 +31,19 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
+        'AccessControl',
         'Plone',
+        'plone.api',
+        'Products.CMFPlone',
+        'Products.MailHost',
         'setuptools',
+        'zope.component',
+        'zope.event',
+        'zope.formlib',
+        'zope.i18nmessageid',
+        'zope.interface',
+        'zope.interface',
+        'zope.schema',
     ],
     extras_require={
         'test': [
