@@ -5,15 +5,10 @@ except ImportError:
     from email.Utils import parseaddr, formataddr
 
 from AccessControl import Unauthorized
-from Products.CMFCore.utils import getToolByName
+from plone import api
+from plone.api.exc import CannotGetPortalError
 from Products.CMFPlone.utils import getSiteEncoding
 from Products.CMFPlone.utils import safe_unicode
-try:
-    from zope.component.hooks import getSite
-    # getSite
-except ImportError:
-    # BBB for Plone 3
-    from zope.app.component.hooks import getSite
 from zope.component import getMultiAdapter
 
 DEFAULT_CHARSET = 'utf-8'
@@ -30,8 +25,10 @@ def get_charset():
     handle that ourselves.
     """
     charset = None
-    portal = getSite()
-    if portal is None:
+    try:
+        portal = api.portal.get()
+    except CannotGetPortalError:
+        # unit test or non-CMF site
         return DEFAULT_CHARSET
     charset = portal.getProperty('email_charset', '')
     if not charset:
@@ -50,21 +47,25 @@ def get_mail_host():
 
     Return None in case of problems.
     """
-    portal = getSite()
-    if portal is None:
+    try:
+        portal = api.portal.get()
+    except CannotGetPortalError:
+        # unit test or non-CMF site
         return None
     request = portal.REQUEST
     ctrlOverview = getMultiAdapter((portal, request),
                                    name='overview-controlpanel')
     mail_settings_correct = not ctrlOverview.mailhost_warning()
     if mail_settings_correct:
-        mail_host = getToolByName(portal, 'MailHost', None)
+        mail_host = api.portal.get_tool('MailHost')
         return mail_host
 
 
 def get_mail_from_address():
-    portal = getSite()
-    if portal is None:
+    try:
+        portal = api.portal.get()
+    except CannotGetPortalError:
+        # unit test or non-CMF site
         return ''
     from_address = portal.getProperty('email_from_address', '')
     from_name = portal.getProperty('email_from_name', '')
@@ -87,11 +88,10 @@ def get_member_email(username=None, portal_membership=None):
 
     Taken from PoiTracker.
     """
-
     if portal_membership is None:
-        portal = getSite()
-        portal_membership = getToolByName(portal, 'portal_membership', None)
-        if portal_membership is None:
+        try:
+            portal_membership = api.portal.get_tool('portal_membership')
+        except CannotGetPortalError:
             # unit test or non-CMF site
             return None
 

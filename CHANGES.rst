@@ -4,7 +4,7 @@ Changelog
 1.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fix package dependencies and depend on `plone.api`_.
 
 
 1.2 (2013-12-03)
@@ -55,3 +55,5 @@ Changelog
 ----------------
 
 - Initial release
+
+.. _`plone.api`: https://pypi.python.org/pypi/plone.api
