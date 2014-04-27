@@ -31,9 +31,14 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'setuptools',
         'Plone',
+        'setuptools',
     ],
+    extras_require={
+        'test': [
+            'Products.PloneTestCase',
+        ],
+    },
     entry_points="""
     # -*- Entry points: -*-
     [z3c.autoinclude.plugin]
