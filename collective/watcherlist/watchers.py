@@ -141,6 +141,8 @@ class WatcherList(object):
             watchers.append(member_id)
         if as_tuple:
             self.watchers = tuple(watchers)
+        else:
+            self.watchers = watchers
 
     def isWatching(self):
         """

@@ -9,6 +9,8 @@ Changelog
 
 - Fixed Plone 5 email sending.  Improved code quality.  Fixed Travis tests.  [maurits]
 
+- When the internal watchers list is of type list (instead of tuple),
+  make sure its updated when toggling a watcher [skurfer]
 
 1.2 (2013-12-03)
 ----------------
