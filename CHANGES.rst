@@ -4,13 +4,16 @@ Changelog
 1.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- No longer support Plone 3.3 and 4.0.  We already were not testing on
+  3.3 anymore, and 4.0 is too hard to keep working too.  [maurits]
+
+- Fixed Plone 5 email sending.  Improved code quality.  Fixed Travis tests.  [maurits]
 
 
 1.2 (2013-12-03)
 ----------------
 
-- Nothing changed yet.
+- Added events, triggers and action for content rules.  [Gagaro]
 
 
 1.1 (2012-11-06)

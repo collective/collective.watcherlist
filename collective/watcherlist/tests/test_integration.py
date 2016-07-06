@@ -1,28 +1,36 @@
+from Acquisition import aq_base
+from Products.CMFPlone.tests.utils import MockMailHost
+from Products.Five import fiveconfigure
+from Products.MailHost.interfaces import IMailHost
+from Products.PloneTestCase import PloneTestCase as ptc
+from Products.PloneTestCase.layer import PloneSite
+from Testing import ZopeTestCase as ztc
+from zope.component import getSiteManager
+
+# Sample implementation:
+import collective.watcherlist
+import collective.watcherlist.sample
+import doctest
 import unittest
 
-from Acquisition import aq_base
-import doctest
-from zope.component import getSiteManager
-from Testing import ZopeTestCase as ztc
+try:
+    # Plone 5
+    from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+    from plone.registry.interfaces import IRegistry
+    from zope.component import getUtility
+except ImportError:
+    # Plone 4 and lower
+    IMailSchema = None
 
 try:
     from Zope2.App import zcml
     zcml  # pyflakes
 except ImportError:
     from Products.Five import zcml
-from Products.Five import fiveconfigure
-from Products.MailHost.interfaces import IMailHost
-from Products.PloneTestCase import PloneTestCase as ptc
-from Products.PloneTestCase.layer import PloneSite
-from Products.CMFPlone.tests.utils import MockMailHost
 ptc.setupPloneSite()
 
 OPTIONFLAGS = (doctest.ELLIPSIS |
                doctest.NORMALIZE_WHITESPACE)
-
-import collective.watcherlist
-# Sample implementation:
-import collective.watcherlist.sample
 
 
 class TestCase(ptc.PloneTestCase):
@@ -54,8 +62,7 @@ class FunctionalTestCase(TestCase, ptc.FunctionalTestCase):
         sm.registerUtility(mailhost, provided=IMailHost)
         # Make sure our mock mailhost does not give a mailhost_warning
         # in the overview-controlpanel.
-        mailhost.smtp_host = 'mock'
-        self.portal.email_from_address = 'admin@example.com'
+        self.configure_mail_host(u'mock', 'admin@example.com')
 
     def _clear(self, call_close_hook=0):
         self.portal.MailHost = self.portal._original_MailHost
@@ -64,6 +71,38 @@ class FunctionalTestCase(TestCase, ptc.FunctionalTestCase):
         sm.registerUtility(aq_base(self.portal._original_MailHost),
                            provided=IMailHost)
         ptc.PloneTestCase._clear(self)
+
+    def get_smtp_host(self):
+        if IMailSchema is None:
+            # Plone 4
+            return self.portal.MailHost.smtp_host
+        else:
+            # Plone 5.0 and higher
+            registry = getUtility(IRegistry)
+            mail_settings = registry.forInterface(
+                IMailSchema, prefix='plone', check=False)
+            return mail_settings.smtp_host
+
+    def configure_mail_host(self, smtp_host, address=None):
+        if IMailSchema is None:
+            # Plone 4
+            self.portal.MailHost.smtp_host = smtp_host
+            if address is not None:
+                self.portal.email_from_address = address
+        else:
+            # Plone 5.0 and higher
+            registry = getUtility(IRegistry)
+            mail_settings = registry.forInterface(
+                IMailSchema, prefix='plone', check=False)
+            if not isinstance(smtp_host, unicode):
+                # must be unicode
+                smtp_host = smtp_host.decode('utf-8')
+            mail_settings.smtp_host = smtp_host
+            if address is not None:
+                if isinstance(address, unicode):
+                    # must be ascii
+                    address = address.encode('utf-8')
+                mail_settings.email_from_address = address
 
     def afterSetUp(self):
         """Add some extra content and do some setup.
