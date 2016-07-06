@@ -96,7 +96,7 @@ give some options too:
 
     >>> browser.open(news.first.absolute_url() + '/@@newsitem-mail')
     >>> print browser.contents
-    <p>Have I got news for <em>you</em>!</p>
+    <...p>Have I got news for <em>you</em>!</p>...
     >>> browser.open(news.first.absolute_url() + '/@@newsitem-mail?type=plain')
     >>> print browser.contents
     >>> browser.open(news.first.absolute_url() + '/@@newsitem-mail?type=subject')
@@ -108,9 +108,9 @@ Now we publish the news item::
     >>> browser.open(news.first.absolute_url())
     >>> browser.getLink('Publish').click()
 
-We have to watchers, so two emails are sent.  There are some minor
+We have two watchers, so two emails are sent.  There are some minor
 differences in the way the SecureMailHost in Plone 3 and the MailHost
-in Plone 4 create the email.  So we do some tricks to only check the
+in Plone 4 and 5 create the email.  So we do some tricks to only check the
 most important parts of the mail, where we do not care about the
 order::
 
@@ -169,7 +169,7 @@ trigger that manually or better, by editing::
     2
 
 Note the different charset and encoding::
- 
+
     >>> mail = sorted(str(self.portal.MailHost.messages[0]).splitlines())
     >>> print '\n'.join(mail)
     <BLANKLINE>
@@ -223,8 +223,8 @@ We do the last edit another time and first unconfigure the MailHost,
 to see if this indeed prevents sending emails (it will print the mail
 for debugging purposes)::
 
-    >>> ori_smtp_host = self.portal.MailHost.smtp_host
-    >>> self.portal.MailHost.smtp_host = ''
+    >>> ori_smtp_host = self.get_smtp_host()
+    >>> self.configure_mail_host(u'')
     >>> browser.open(news.first.absolute_url() + '/edit')
     >>> browser.getControl('Save').click()
     Subject = [No subject]
@@ -233,4 +233,4 @@ for debugging purposes)::
     ...
     >>> len(self.portal.MailHost.messages)
     0
-    >>> self.portal.MailHost.smtp_host = ori_smtp_host
+    >>> self.configure_mail_host(ori_smtp_host)

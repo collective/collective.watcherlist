@@ -16,6 +16,14 @@ except ImportError:
     from zope.app.component.hooks import getSite
 from zope.component import getMultiAdapter
 
+try:
+    # Plone 5
+    from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+    from plone.registry.interfaces import IRegistry
+    from zope.component import getUtility
+except ImportError:
+    # Plone 4 and lower
+    IMailSchema = None
 DEFAULT_CHARSET = 'utf-8'
 
 
@@ -33,7 +41,16 @@ def get_charset():
     portal = getSite()
     if portal is None:
         return DEFAULT_CHARSET
-    charset = portal.getProperty('email_charset', '')
+    if IMailSchema is None:
+        # Plone 4
+        charset = portal.getProperty('email_charset', '')
+    else:
+        # Plone 5.0 and higher
+        registry = getUtility(IRegistry)
+        mail_settings = registry.forInterface(
+            IMailSchema, prefix='plone', check=False)
+        charset = mail_settings.email_charset
+
     if not charset:
         charset = getSiteEncoding(portal)
     return charset
@@ -66,8 +83,18 @@ def get_mail_from_address():
     portal = getSite()
     if portal is None:
         return ''
-    from_address = portal.getProperty('email_from_address', '')
-    from_name = portal.getProperty('email_from_name', '')
+    if IMailSchema is None:
+        # Plone 4
+        from_address = portal.getProperty('email_from_address', '')
+        from_name = portal.getProperty('email_from_name', '')
+    else:
+        # Plone 5.0 and higher
+        registry = getUtility(IRegistry)
+        mail_settings = registry.forInterface(
+            IMailSchema, prefix='plone', check=False)
+        from_address = mail_settings.email_from_address
+        from_name = mail_settings.email_from_name
+
     mfrom = formataddr((from_name, from_address))
     if parseaddr(mfrom)[1] != from_address:
         # formataddr probably got confused by special characters.
