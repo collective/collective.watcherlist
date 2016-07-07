@@ -25,8 +25,8 @@ class WatcherList(object):
     The lists are stored on the content objects that are being
     watched.
 
-    XXX Watchers: perhaps for each watcher keep some configuration
-    like this:
+    A not yet implemented idea for Watchers: perhaps for each watcher
+    keep some configuration like this:
 
     - wants plain/html
 

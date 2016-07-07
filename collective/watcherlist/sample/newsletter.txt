@@ -184,41 +184,6 @@ Note the different charset and encoding::
     True
     >>> self.portal.MailHost.reset()
 
-With Zope 2.12.3 or higher we know that we can use the normal ``send``
-method of the MailHost, but otherwise the secureSend method is better.
-We do want to try both in the tests, if possible.  But on Plone 3 you
-should just always use secureSend; in our code you even get a
-TypeError if you do not use it, because the send method does not yet
-accept the 'immediate' argument we pass it.  We can at least force
-using secureSend once here and restore the original setting when we
-are done.
-
-    >>> import collective.watcherlist.mailer
-    >>> ori_USE_SECURE_SEND = collective.watcherlist.mailer.USE_SECURE_SEND
-    >>> collective.watcherlist.mailer.USE_SECURE_SEND = True
-
-So we do the last edit a second time::
-
-    >>> browser.open(news.first.absolute_url() + '/edit')
-    >>> browser.getControl('Save').click()
-
-The resulting email is slightly different, but still basically the same::
-
-    >>> len(self.portal.MailHost.messages)
-    2
-    >>> mail = sorted(str(self.portal.MailHost.messages[0]).splitlines())
-    >>> print '\n'.join(mail)
-    <BLANKLINE>
-    ...
-    From:...admin@example...
-    ...
-    Subject:...No subject...
-    To: guido@example...
-    >>> 'Breaking =C3=AFnt=C3=A9rn=C3=A4ti=C3=B3nal news: First i18n news' in mail or 'QnJlYWtpbmcgw69udMOpcm7DpHRpw7NuYWwgbmV3czogRmlyc3QgaTE4biBuZXdz' in mail
-    True
-    >>> self.portal.MailHost.reset()
-    >>> collective.watcherlist.mailer.USE_SECURE_SEND = ori_USE_SECURE_SEND
-
 We do the last edit another time and first unconfigure the MailHost,
 to see if this indeed prevents sending emails (it will print the mail
 for debugging purposes)::

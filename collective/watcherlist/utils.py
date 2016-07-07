@@ -1,20 +1,12 @@
-try:
-    from email.utils import parseaddr, formataddr
-except ImportError:
-    # BBB for python2.4 (Plone 3)
-    from email.Utils import parseaddr, formataddr
-
 from AccessControl import Unauthorized
+from email.utils import formataddr
+from email.utils import parseaddr
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import getSiteEncoding
 from Products.CMFPlone.utils import safe_unicode
-try:
-    from zope.component.hooks import getSite
-    # getSite
-except ImportError:
-    # BBB for Plone 3
-    from zope.app.component.hooks import getSite
 from zope.component import getMultiAdapter
+from zope.component.hooks import getSite
+
 
 try:
     # Plone 5

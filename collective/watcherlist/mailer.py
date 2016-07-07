@@ -1,19 +1,12 @@
-import logging
-from smtplib import SMTPException
-import pkg_resources
-import socket
-from Products.MailHost.MailHost import MailHostError
-
 from collective.watcherlist import utils
+from Products.MailHost.MailHost import MailHostError
+from smtplib import SMTPException
+
+import logging
+import socket
+
 
 logger = logging.getLogger('collective.watcherlist')
-
-zope2_egg = pkg_resources.working_set.find(
-    pkg_resources.Requirement.parse('Zope2'))
-USE_SECURE_SEND = True
-if zope2_egg and (zope2_egg.parsed_version >=
-                  pkg_resources.parse_version('2.12.3')):
-    USE_SECURE_SEND = False
 
 
 def simple_send_mail(message, addresses, subject, immediate=True):
@@ -55,19 +48,13 @@ def simple_send_mail(message, addresses, subject, immediate=True):
         if not address:
             continue
         try:
-            if USE_SECURE_SEND:
-                mail_host.secureSend(message=message,
-                                     mto=address,
-                                     mfrom=mfrom,
-                                     subject=subject,
-                                     charset=header_charset)
-            else:
-                mail_host.send(message,
-                               mto=address,
-                               mfrom=mfrom,
-                               subject=subject,
-                               immediate=immediate,
-                               charset=header_charset)
+            mail_host.send(
+                message,
+                mto=address,
+                mfrom=mfrom,
+                subject=subject,
+                immediate=immediate,
+                charset=header_charset)
         except (socket.error, SMTPException, MailHostError):
             logger.warn('Could not send email to %s with subject %s',
                         address, subject)

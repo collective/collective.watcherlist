@@ -1,11 +1,12 @@
 Changelog
 =========
 
-1.3 (unreleased)
+2.0 (unreleased)
 ----------------
 
-- No longer support Plone 3.3 and 4.0.  We already were not testing on
-  3.3 anymore, and 4.0 is too hard to keep working too.  [maurits]
+- Removed backwards compatibility code for Plone 3.3 and 4.0.  We
+  already were not testing on 3.3 anymore, and 4.0 is too hard to keep
+  working too.  [maurits]
 
 - Fixed Plone 5 email sending.  Improved code quality.  Fixed Travis tests.  [maurits]
 
