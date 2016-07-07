@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0 (unreleased)
+2.0 (2016-07-07)
 ----------------
 
 - Removed backwards compatibility code for Plone 3.3 and 4.0.  We
