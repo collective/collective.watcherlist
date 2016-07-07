@@ -6,9 +6,6 @@
     :target: https://coveralls.io/r/collective/collective.watcherlist
     :alt: Coveralls badge
 
-.. image:: https://pypip.in/d/collective.cover/badge.png
-    :target: https://pypi.python.org/pypi/collective.cover/
-    :alt: Downloads
 
 Introduction
 ============
