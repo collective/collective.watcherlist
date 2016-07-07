@@ -2,24 +2,13 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser">
 
-  <!-- Originally we registered some adapters, subscribers and browser
-       pages for interfaces.IATFolder and interfaces.IATNewsItem.
-       Fine on Plone 4, but it gives errors on Plone 3, as then those
-       are old style Zope 2 interfaces.  So we use the interface
-       (singular) which works for both (in Plone 4 it is there only
-       for BBB reasons).  More fun: the news folder is a large folder,
-       so we should register for IATBTreeFolder, but that no longer
-       exists in Plone 4.  So we just register for the general
-       IATContentType, which works too for our purposes.  We could use
-       IBaseContent from Archetypes too probably, which we already do
-       in a few spots. -->
   <adapter
-      for="Products.ATContentTypes.interface.IATContentType"
+      for="Products.ATContentTypes.interfaces.IATContentType"
       factory="collective.watcherlist.watchers.WatcherList"
       />
 
   <subscriber
-      for="Products.ATContentTypes.interface.IATContentType
+      for="Products.ATContentTypes.interfaces.IATContentType
            Products.DCWorkflow.interfaces.IAfterTransitionEvent"
       handler=".eventhandlers.mail_news"
       />
@@ -32,7 +21,7 @@
 
   <browser:page
      name="newsitem-mail"
-     for="Products.ATContentTypes.interface.IATContentType"
+     for="Products.ATContentTypes.interfaces.IATContentType"
      permission="zope2.View"
      class=".browser.NewsItemMail"
      />
@@ -46,7 +35,7 @@
 
   <browser:page
      name="subscription_form"
-     for="Products.ATContentTypes.interface.IATContentType"
+     for="Products.ATContentTypes.interfaces.IATContentType"
      permission="zope2.View"
      template="form.pt"
      class=".browser.SubscriptionForm"
@@ -54,7 +43,7 @@
 
   <browser:page
      name="subscription_overview"
-     for="Products.ATContentTypes.interface.IATContentType"
+     for="Products.ATContentTypes.interfaces.IATContentType"
      permission="zope2.View"
      class=".browser.SubscriptionOverview"
      />
