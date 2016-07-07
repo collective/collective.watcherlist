@@ -30,7 +30,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'Plone',
+        'Products.CMFPlone',
         'setuptools',
     ],
     extras_require={
