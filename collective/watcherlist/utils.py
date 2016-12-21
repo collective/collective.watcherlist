@@ -87,6 +87,9 @@ def get_mail_from_address():
         from_address = mail_settings.email_from_address
         from_name = mail_settings.email_from_name
 
+    if not from_address:
+        return ''
+    from_address = from_address.strip()
     mfrom = formataddr((from_name, from_address))
     if parseaddr(mfrom)[1] != from_address:
         # formataddr probably got confused by special characters.
@@ -122,7 +125,7 @@ def get_member_email(username=None, portal_membership=None):
         if username is not None and '@' in username:
             # Use case: explicitly adding a mailing list address
             # to the watchers.
-            return username
+            return username.strip()
         return None
 
     try:
@@ -131,4 +134,6 @@ def get_member_email(username=None, portal_membership=None):
         # this will happen if CMFMember is installed and the email
         # property is protected via AT security
         email = member.getField('email').getAccessor(member)()
-    return email
+    if not email:
+        return None
+    return email.strip()

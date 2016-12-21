@@ -4,7 +4,10 @@ Changelog
 2.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Strip the email address that we get from a member or the site.
+  I have a site where some email addresses are ``test@example.org\r\n``,
+  which gives an error when sending.
+  [maurits]
 
 
 2.0 (2016-07-07)
