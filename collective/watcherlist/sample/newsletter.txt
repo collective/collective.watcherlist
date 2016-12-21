@@ -199,3 +199,19 @@ for debugging purposes)::
     >>> len(self.portal.MailHost.messages)
     0
     >>> self.configure_mail_host(ori_smtp_host)
+
+Let's play with disallowing recursiveness.
+
+    >>> from collective.watcherlist.interfaces import IWatcherList
+    >>> first_list = IWatcherList(news.first)
+    >>> first_list.allow_recursive
+    True
+    >>> first_list.watchers
+    []
+    >>> first_list.addresses
+    ('guido@example.com',)
+    >>> first_list.allow_recursive = False
+    >>> first_list.watchers
+    []
+    >>> first_list.addresses
+    ()

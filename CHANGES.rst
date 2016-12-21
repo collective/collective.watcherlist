@@ -4,6 +4,14 @@ Changelog
 2.1 (unreleased)
 ----------------
 
+- Check ``allow_recursive`` on the watcher list.  The default value is
+  true, which gives the same behavior as before.  When the value is
+  false, the ``addresses`` property only looks for watchers on the
+  current item, not on the parent.  A sample usage would be in
+  Products.Poi to only allow recursive if an issue is not yet
+  assigned.  (I am going to use this in custom code for a client).
+  [maurits]
+
 - Strip the email address that we get from a member or the site.
   I have a site where some email addresses are ``test@example.org\r\n``,
   which gives an error when sending.

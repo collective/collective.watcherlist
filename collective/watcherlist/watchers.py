@@ -101,6 +101,16 @@ class WatcherList(object):
 
     send_emails = property(__get_send_emails, __set_send_emails)
 
+    def __get_allow_recursive(self):
+        return self.__mapping.get('allow_recursive', True)
+
+    def __set_allow_recursive(self, v):
+        if not isinstance(v, bool):
+            v = bool(v)
+        self.__mapping['allow_recursive'] = v
+
+    allow_recursive = property(__get_allow_recursive, __set_allow_recursive)
+
     def append(self, item):
         notify(event.ToggleWatchingEvent(self.context))
         notify(event.AddedToWatchingEvent(self.context))
@@ -190,16 +200,17 @@ class WatcherList(object):
                                     for w in self.watchers])
         addresses.union_update(self.extra_addresses)
 
-        # Get addresses from parent (might be recursive).
-        parent_list = IWatcherList(aq_parent(context), None)
-        if parent_list is not None:
-            addresses.union_update(parent_list.addresses)
-
         # Discard invalid addresses:
         addresses.discard(None)
         # Discard current user:
         email = get_member_email()
         addresses.discard(email)
+
+        if self.allow_recursive:
+            # Get addresses from parent (might be recursive).
+            parent_list = IWatcherList(aq_parent(context), None)
+            if parent_list is not None:
+                addresses.union_update(parent_list.addresses)
 
         return tuple(addresses)
 
