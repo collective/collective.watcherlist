@@ -236,6 +236,7 @@ class WatcherList(object):
             return
         if isinstance(addresses, basestring):
             addresses = [addresses]
+        immediate = kw.pop('immediate', False)
 
         request = context.REQUEST
         mail_content = getMultiAdapter((context, request), name=view_name)
@@ -245,4 +246,4 @@ class WatcherList(object):
             logger.warn("Not sending empty email.")
             return
         subject = mail_content.subject
-        simple_send_mail(message, addresses, subject)
+        simple_send_mail(message, addresses, subject, immediate=immediate)
