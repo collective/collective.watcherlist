@@ -1,8 +1,20 @@
 Changelog
 =========
 
-2.1 (unreleased)
+3.0 (unreleased)
 ----------------
+
+- Pass ``immediate=False`` by default.  This used to be ``True``.  The
+  original idea was to send emails immediately, so that we could catch
+  any errors ourselves and continue with a warning.  But since Plone
+  4.1 the emails are by default sent at the end of the transaction,
+  and exceptions are caught.  For immediate mails they are not caught
+  there.  So for our uses cases it makes most sense to not send emails
+  immediately, as then Plone does what we want already.  You can still
+  pass ``immediate=True`` to ``mailer.simple_send_mail`` or now also
+  to ``watchers.send`` if you want the old behavior back.
+  This fixes `issue #8 <https://github.com/collective/collective.watcherlist/issues/8>`_.
+  [maurits]
 
 - Check ``allow_recursive`` on the watcher list.  The default value is
   true, which gives the same behavior as before.  When the value is
