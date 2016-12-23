@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0 (unreleased)
+3.0 (2016-12-23)
 ----------------
 
 - Pass ``immediate=False`` by default.  This used to be ``True``.  The
