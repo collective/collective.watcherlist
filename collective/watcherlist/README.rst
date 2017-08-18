@@ -195,8 +195,4 @@ Reset that::
 
   >>> watcherlist.send_emails = True
 
-Look at Products.Poi_ for some more examples of what you can do.
-
-.. _Products.Poi: http://plone.org/products/poi
-.. _`Singing and Dancing`: http://plone.org/products/dancing
-.. _PloneFormGen: http://plone.org/products/ploneformgen
+Look at `Products.Poi <https://pypi.python.org/pypi/Products.Poi>`_ for some more examples of what you can do.

@@ -12,7 +12,7 @@ Introduction
 
 ``collective.watcherlist`` is a package that enables you to keep a
 list of people who want to receive emails when an item gets updated.
-The main use case is something like Products.Poi_, which is an issue
+The main use case is something like `Products.Poi <https://pypi.python.org/pypi/Products.Poi>`_, which is an issue
 tracker for Plone.  That product lets you create an issue tracker.  In
 this tracker people can add issues.  The tracker has managers.
 Everytime a new issue is posted, the managers should receive an email.
@@ -39,7 +39,7 @@ or CMF, contact me: we can probably do some conditional imports
 instead.
 
 ``collective.watcherlist`` might also be usable as a basis for a
-newsletter product.  If you feel `Singing and Dancing`_ is overkill
+newsletter product.  If you feel `Singing and Dancing <https://pypi.python.org/pypi/collective.singing>`_ is overkill
 for you, or too hard to adapt to your specific needs, you could try
 writing some code around ``collective.watcherlist`` instead.
 
@@ -55,7 +55,7 @@ In its simplest form, the integration that is needed, is this:
   is fine: ``collective.watcherlist.watchers.WatcherList``
 
 - Create an html form where people can add themselves to the watcher
-  list.  This could also be PloneFormGen_ form with a custom script
+  list.  This could also be `PloneFormGen <https://pypi.python.org/pypi/Products.PloneFormGen>`_ form with a custom script
   adapter as action.
 
 - Register a BrowserView for your content type, inheriting from
@@ -96,5 +96,5 @@ People
 Companies
 ---------
 
-* Zest Software http://zestsoftware.nl/
+* Zest Software https://zestsoftware.nl/
 * `Makina Corpus <http://www.makina-corpus.org>`_
