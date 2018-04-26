@@ -4,7 +4,9 @@ Changelog
 3.0.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Don't test with Plone 4.1, 4.2 or Python 2.6 anymore.
+  It should still work, but I don't want to spend time fixing the build on Travis.
+  [maurits]
 
 
 3.0.1 (2018-04-26)
