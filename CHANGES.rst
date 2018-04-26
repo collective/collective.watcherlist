@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.1 (unreleased)
+3.0.1 (2018-04-26)
 ------------------
 
 - Declare ``zope.formlib`` dependency.  [maurits]
