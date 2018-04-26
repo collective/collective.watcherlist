@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.2 (unreleased)
+3.1.0 (unreleased)
 ------------------
 
 - Don't test with Plone 4.1, 4.2 or Python 2.6 anymore.
