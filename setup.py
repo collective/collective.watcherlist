@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'Products.CMFPlone',
         'setuptools',
+        'zope.formlib',
     ],
     extras_require={
         'test': [

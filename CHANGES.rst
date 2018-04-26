@@ -4,7 +4,7 @@ Changelog
 3.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Declare ``zope.formlib`` dependency.  [maurits]
 
 
 3.0 (2016-12-23)
