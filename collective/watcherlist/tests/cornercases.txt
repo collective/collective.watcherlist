@@ -74,9 +74,9 @@ Let's see if we can mock a portal_membership tool into these tests,
 including mock users::
 
   >>> from persistent.interfaces import IPersistent
-  >>> from zope.interface import implements
+  >>> from zope.interface import implementer
+  >>> @implementer(IPersistent)
   >>> class MockMemship(object):
-  ...     implements(IPersistent)
   ...     current_member_name = None
   ...     members = []
   ...     def isAnonymousUser(self):

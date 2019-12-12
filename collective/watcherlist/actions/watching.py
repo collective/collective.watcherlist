@@ -30,8 +30,8 @@ class IWatchingAction(interface.Interface):
     )
 
 
+@interface.implementer(IWatchingAction, IRuleElementData)
 class WatchingAction(SimpleItem):
-    interface.implements(IWatchingAction, IRuleElementData)
 
     watching = 'watch'
     name = ''
@@ -39,8 +39,8 @@ class WatchingAction(SimpleItem):
     summary = _(u'Change if the user is in the watchers list or not.')
 
 
+@interface.implementer(IExecutable)
 class WatchingActionExecutor(object):
-    interface.implements(IExecutable)
     adapts(interface.Interface, IWatchingAction, interface.Interface)
 
     def __init__(self, context, element, event):
