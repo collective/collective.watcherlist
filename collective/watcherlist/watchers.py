@@ -233,7 +233,7 @@ class WatcherList(object):
         if not addresses:
             logger.info("No addresses found.")
             return
-        if isinstance(addresses, basestring):
+        if isinstance(addresses, str):
             addresses = [addresses]
         immediate = kw.pop('immediate', False)
 
