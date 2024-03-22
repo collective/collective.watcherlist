@@ -7,16 +7,18 @@ class IAddedToWatchingEvent(IObjectEvent):
     """Event for when a user is added to the watchers list."""
 
 
+@interface.implementer(IAddedToWatchingEvent)
 class AddedToWatchingEvent(ObjectEvent):
-    interface.implements(IAddedToWatchingEvent)
+    """"""
 
 
 class IRemovedFromWatchingEvent(IObjectEvent):
     """Event for when a user is removed from the watchers list."""
 
 
+@interface.implementer(IRemovedFromWatchingEvent)
 class RemovedFromWatchingEvent(ObjectEvent):
-    interface.implements(IRemovedFromWatchingEvent)
+    """"""
 
 
 class IToggleWatchingEvent(IObjectEvent):
@@ -24,5 +26,6 @@ class IToggleWatchingEvent(IObjectEvent):
     This event is sent before the add or remove events."""
 
 
+@interface.implementer(IToggleWatchingEvent)
 class ToggleWatchingEvent(ObjectEvent):
-    interface.implements(IToggleWatchingEvent)
+    """"""

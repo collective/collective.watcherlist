@@ -6,8 +6,7 @@ from persistent.dict import PersistentDict
 from persistent.list import PersistentList
 from zope.annotation.interfaces import IAnnotations
 from zope.event import notify
-from zope.interface import implements
-import sets
+from zope.interface import implementer
 
 from collective.watcherlist.interfaces import IWatcherList
 from collective.watcherlist.mailer import simple_send_mail
@@ -36,7 +35,7 @@ class WatcherList(object):
 
     """
 
-    implements(IWatcherList)
+    implementer(IWatcherList)
     ANNO_KEY = 'collective.watcherlist'
 
     def __init__(self, context):
@@ -186,7 +185,7 @@ class WatcherList(object):
             return ()
 
         # make sure no duplicates are added
-        addresses = sets.Set()
+        addresses = set()
 
         context = aq_inner(self.context)
         memship = getToolByName(context, 'portal_membership', None)
@@ -194,11 +193,11 @@ class WatcherList(object):
             # Okay, either we are in a simple unit test, or someone is
             # using this package outside of CMF/Plone.  We should
             # assume the watchers are simple email addresses.
-            addresses.union_update(self.watchers)
+            addresses.update(self.watchers)
         else:
-            addresses.union_update([get_member_email(w, memship)
+            addresses.update([get_member_email(w, memship)
                                     for w in self.watchers])
-        addresses.union_update(self.extra_addresses)
+        addresses.update(self.extra_addresses)
 
         # Discard invalid addresses:
         addresses.discard(None)
@@ -210,7 +209,7 @@ class WatcherList(object):
             # Get addresses from parent (might be recursive).
             parent_list = IWatcherList(aq_parent(context), None)
             if parent_list is not None:
-                addresses.union_update(parent_list.addresses)
+                addresses.update(parent_list.addresses)
 
         return tuple(addresses)
 
@@ -234,7 +233,7 @@ class WatcherList(object):
         if not addresses:
             logger.info("No addresses found.")
             return
-        if isinstance(addresses, basestring):
+        if isinstance(addresses, str):
             addresses = [addresses]
         immediate = kw.pop('immediate', False)
 

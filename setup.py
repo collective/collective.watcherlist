@@ -5,7 +5,7 @@ readme = open('README.rst').read()
 tests = open(os.path.join('collective', 'watcherlist', 'README.rst')).read()
 changes = open("CHANGES.rst").read()
 
-version = '3.1.1.dev0'
+version = '3.2.dev0'
 
 setup(
     name='collective.watcherlist',
@@ -16,9 +16,12 @@ setup(
         "Framework :: Plone",
         "Framework :: Plone :: 4.3",
         "Framework :: Plone :: 5.0",
+        "Framework :: Plone :: 5.1",
+        "Framework :: Plone :: 5.2",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.7",
     ],
     keywords='Plone notifications watching',
     author='Maurits van Rees',
