@@ -19,7 +19,7 @@ logger = logging.getLogger("collective.watcherlist")
 _marker = object()
 
 
-class WatcherList(object):
+class WatcherList:
     """Adapter for lists of watchers.
 
     The lists are stored on the content objects that are being

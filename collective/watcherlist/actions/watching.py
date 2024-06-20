@@ -35,7 +35,7 @@ class WatchingAction(SimpleItem):
     summary = _("Change if the user is in the watchers list or not.")
 
 
-class WatchingActionExecutor(object):
+class WatchingActionExecutor:
     interface.implements(IExecutable)
     adapts(interface.Interface, IWatchingAction, interface.Interface)
 
