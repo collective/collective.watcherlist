@@ -1,10 +1,11 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:browser="http://namespaces.zope.org/browser">
+    xmlns:browser="http://namespaces.zope.org/browser"
+    >
 
   <adapter
-      for="Products.ATContentTypes.interfaces.IATContentType"
       factory="collective.watcherlist.watchers.WatcherList"
+      for="Products.ATContentTypes.interfaces.IATContentType"
       />
 
   <subscriber
@@ -20,32 +21,32 @@
       />
 
   <browser:page
-     name="newsitem-mail"
-     for="Products.ATContentTypes.interfaces.IATContentType"
-     permission="zope2.View"
-     class=".browser.NewsItemMail"
-     />
+      name="newsitem-mail"
+      for="Products.ATContentTypes.interfaces.IATContentType"
+      class=".browser.NewsItemMail"
+      permission="zope2.View"
+      />
 
   <browser:page
-     name="i18n-mail"
-     for="Products.Archetypes.interfaces.IBaseContent"
-     permission="zope2.View"
-     class=".browser.InternationalMail"
-     />
+      name="i18n-mail"
+      for="Products.Archetypes.interfaces.IBaseContent"
+      class=".browser.InternationalMail"
+      permission="zope2.View"
+      />
 
   <browser:page
-     name="subscription_form"
-     for="Products.ATContentTypes.interfaces.IATContentType"
-     permission="zope2.View"
-     template="form.pt"
-     class=".browser.SubscriptionForm"
-     />
+      name="subscription_form"
+      for="Products.ATContentTypes.interfaces.IATContentType"
+      class=".browser.SubscriptionForm"
+      template="form.pt"
+      permission="zope2.View"
+      />
 
   <browser:page
-     name="subscription_overview"
-     for="Products.ATContentTypes.interfaces.IATContentType"
-     permission="zope2.View"
-     class=".browser.SubscriptionOverview"
-     />
+      name="subscription_overview"
+      for="Products.ATContentTypes.interfaces.IATContentType"
+      class=".browser.SubscriptionOverview"
+      permission="zope2.View"
+      />
 
 </configure>
