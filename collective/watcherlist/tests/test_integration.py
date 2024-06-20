@@ -24,6 +24,14 @@ except ImportError:
     IMailSchema = None
 
 try:
+    # Plone6.1
+    from plone.base.utils import safe_text
+except ImportError:
+    # Plone 6.0, 5.2
+    from Products.CMFPlone.utils import safe_text
+
+
+try:
     from Zope2.App import zcml
 
     zcml  # pyflakes
@@ -96,15 +104,9 @@ class FunctionalTestCase(TestCase, ptc.FunctionalTestCase):
             mail_settings = registry.forInterface(
                 IMailSchema, prefix="plone", check=False
             )
-            if not isinstance(smtp_host, unicode):
-                # must be unicode
-                smtp_host = smtp_host.decode("utf-8")
-            mail_settings.smtp_host = smtp_host
+            mail_settings.smtp_host = safe_text(smtp_host)
             if address is not None:
-                if isinstance(address, unicode):
-                    # must be ascii
-                    address = address.encode("utf-8")
-                mail_settings.email_from_address = address
+                mail_settings.email_from_address = safe_text(address)
 
     def afterSetUp(self):
         """Add some extra content and do some setup."""
