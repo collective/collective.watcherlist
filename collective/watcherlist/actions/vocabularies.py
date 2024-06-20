@@ -1,6 +1,6 @@
-from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
-
 from collective.watcherlist.i18n import _
+from zope.schema.vocabulary import SimpleTerm
+from zope.schema.vocabulary import SimpleVocabulary
 
 
 watchingChoice = SimpleVocabulary(

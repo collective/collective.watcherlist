@@ -1,4 +1,5 @@
 from collective.watcherlist import utils
+
 import logging
 
 

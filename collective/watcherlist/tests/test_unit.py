@@ -1,7 +1,8 @@
-import unittest
+from zope.component import testing
 
 import doctest
-from zope.component import testing
+import unittest
+
 
 OPTIONFLAGS = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
 

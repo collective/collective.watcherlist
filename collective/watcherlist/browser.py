@@ -1,8 +1,7 @@
-from email.MIMEText import MIMEText
-from email.MIMEMultipart import MIMEMultipart
-from Products.Five.browser import BrowserView
-
 from collective.watcherlist import utils
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
+from Products.Five.browser import BrowserView
 
 
 class BaseMail(BrowserView):

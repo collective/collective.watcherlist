@@ -1,6 +1,6 @@
+from zope import interface
 from zope.component.interfaces import IObjectEvent
 from zope.component.interfaces import ObjectEvent
-from zope import interface
 
 
 class IAddedToWatchingEvent(IObjectEvent):

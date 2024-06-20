@@ -1,5 +1,8 @@
+from setuptools import find_packages
+from setuptools import setup
+
 import os
-from setuptools import setup, find_packages
+
 
 readme = open("README.rst").read()
 tests = open(os.path.join("collective", "watcherlist", "README.rst")).read()

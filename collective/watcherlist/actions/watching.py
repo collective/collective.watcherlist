@@ -1,16 +1,17 @@
+from collective.watcherlist.actions.vocabularies import watchingChoice
+from collective.watcherlist.i18n import _
+from collective.watcherlist.interfaces import IWatcherList
 from OFS.SimpleItem import SimpleItem
-from plone.app.contentrules.browser.formhelper import AddForm, EditForm
-from plone.contentrules.rule.interfaces import IRuleElementData, IExecutable
+from plone.app.contentrules.browser.formhelper import AddForm
+from plone.app.contentrules.browser.formhelper import EditForm
+from plone.contentrules.rule.interfaces import IExecutable
+from plone.contentrules.rule.interfaces import IRuleElementData
 from Products.CMFPlone import PloneMessageFactory as _p
-from zope.formlib import form
-from zope.component import adapts
 from zope import component
 from zope import interface
 from zope import schema
-
-from collective.watcherlist.actions.vocabularies import watchingChoice
-from collective.watcherlist.interfaces import IWatcherList
-from collective.watcherlist.i18n import _
+from zope.component import adapts
+from zope.formlib import form
 
 
 class IWatchingAction(interface.Interface):

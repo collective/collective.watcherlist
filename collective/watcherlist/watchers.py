@@ -1,18 +1,20 @@
-import logging
-from zope.component import getMultiAdapter
-from Acquisition import aq_inner, aq_parent
-from Products.CMFCore.utils import getToolByName
-from persistent.dict import PersistentDict
-from persistent.list import PersistentList
-from zope.annotation.interfaces import IAnnotations
-from zope.event import notify
-from zope.interface import implements
-import sets
-
+from Acquisition import aq_inner
+from Acquisition import aq_parent
+from collective.watcherlist import event
 from collective.watcherlist.interfaces import IWatcherList
 from collective.watcherlist.mailer import simple_send_mail
 from collective.watcherlist.utils import get_member_email
-from collective.watcherlist import event
+from persistent.dict import PersistentDict
+from persistent.list import PersistentList
+from Products.CMFCore.utils import getToolByName
+from zope.annotation.interfaces import IAnnotations
+from zope.component import getMultiAdapter
+from zope.event import notify
+from zope.interface import implements
+
+import logging
+import sets
+
 
 logger = logging.getLogger("collective.watcherlist")
 

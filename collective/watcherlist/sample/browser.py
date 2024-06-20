@@ -1,7 +1,7 @@
 from Acquisition import aq_inner
-from Products.Five.browser import BrowserView
 from collective.watcherlist.browser import BaseMail
 from collective.watcherlist.interfaces import IWatcherList
+from Products.Five.browser import BrowserView
 
 
 class NewsItemMail(BaseMail):

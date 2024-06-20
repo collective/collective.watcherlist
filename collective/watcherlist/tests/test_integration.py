@@ -13,10 +13,11 @@ import collective.watcherlist.sample
 import doctest
 import unittest
 
+
 try:
     # Plone 5
-    from Products.CMFPlone.interfaces.controlpanel import IMailSchema
     from plone.registry.interfaces import IRegistry
+    from Products.CMFPlone.interfaces.controlpanel import IMailSchema
     from zope.component import getUtility
 except ImportError:
     # Plone 4 and lower
