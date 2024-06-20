@@ -15,7 +15,7 @@ list of people who want to receive emails when an item gets updated.
 The main use case is something like `Products.Poi <https://pypi.python.org/pypi/Products.Poi>`_, which is an issue
 tracker for Plone.  That product lets you create an issue tracker.  In
 this tracker people can add issues.  The tracker has managers.
-Everytime a new issue is posted, the managers should receive an email.
+Every time a new issue is posted, the managers should receive an email.
 When a manager responds to an issue, the original poster (and the
 other managers) should get an email.  Anyone interested in following
 the issue, should be able to add themselves to the list of people who
@@ -76,7 +76,7 @@ It triggers a zope event on all basic actions done on the watcherlist:
 * RemovedFromWatchingEvent
 * AddedToWatchingEvent
 
-Those events are registred to be useable as content rule trigger so you can
+Those events are registered to be usable as content rule trigger so you can
 create a rule based on it.
 
 It also provides a content rule action so you can create an action that's
