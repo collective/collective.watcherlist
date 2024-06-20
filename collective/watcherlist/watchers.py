@@ -14,7 +14,7 @@ from collective.watcherlist.mailer import simple_send_mail
 from collective.watcherlist.utils import get_member_email
 from collective.watcherlist import event
 
-logger = logging.getLogger('collective.watcherlist')
+logger = logging.getLogger("collective.watcherlist")
 
 _marker = object()
 
@@ -37,38 +37,35 @@ class WatcherList(object):
     """
 
     implements(IWatcherList)
-    ANNO_KEY = 'collective.watcherlist'
+    ANNO_KEY = "collective.watcherlist"
 
     def __init__(self, context):
         self.context = context
         annotations = IAnnotations(self.context)
         self.__mapping = annotations.get(self.ANNO_KEY, None)
         if self.__mapping is None:
-            info = dict(
-                watchers=PersistentList(),
-                extra_addresses=PersistentList())
+            info = dict(watchers=PersistentList(), extra_addresses=PersistentList())
             self.__mapping = PersistentDict(info)
             annotations[self.ANNO_KEY] = self.__mapping
 
     def __get_watchers(self):
-        return self.__mapping.get('watchers')
+        return self.__mapping.get("watchers")
 
     def __set_watchers(self, v):
         if not isinstance(v, PersistentList):
             v = PersistentList(v)
-        self.__mapping['watchers'] = v
+        self.__mapping["watchers"] = v
 
     watchers = property(__get_watchers, __set_watchers)
 
     def __get_extra_addresses(self):
-        """Extra email addresses
-        """
-        return self.__mapping.get('extra_addresses')
+        """Extra email addresses"""
+        return self.__mapping.get("extra_addresses")
 
     def __set_extra_addresses(self, v):
         if not isinstance(v, PersistentList):
             v = PersistentList(v)
-        self.__mapping['extra_addresses'] = v
+        self.__mapping["extra_addresses"] = v
 
     extra_addresses = property(__get_extra_addresses, __set_extra_addresses)
 
@@ -80,7 +77,7 @@ class WatcherList(object):
         in the case of Poi we only set this on the tracker, not on
         individual issues.
         """
-        setting = self.__mapping.get('send_emails', _marker)
+        setting = self.__mapping.get("send_emails", _marker)
         if setting is not _marker:
             # We have an explicit setting.
             return setting
@@ -97,17 +94,17 @@ class WatcherList(object):
     def __set_send_emails(self, v):
         if not isinstance(v, bool):
             v = bool(v)
-        self.__mapping['send_emails'] = v
+        self.__mapping["send_emails"] = v
 
     send_emails = property(__get_send_emails, __set_send_emails)
 
     def __get_allow_recursive(self):
-        return self.__mapping.get('allow_recursive', True)
+        return self.__mapping.get("allow_recursive", True)
 
     def __set_allow_recursive(self, v):
         if not isinstance(v, bool):
             v = bool(v)
-        self.__mapping['allow_recursive'] = v
+        self.__mapping["allow_recursive"] = v
 
     allow_recursive = property(__get_allow_recursive, __set_allow_recursive)
 
@@ -128,7 +125,7 @@ class WatcherList(object):
 
         If the current value is a tuple, we keep it that way.
         """
-        memship = getToolByName(self.context, 'portal_membership', None)
+        memship = getToolByName(self.context, "portal_membership", None)
         if memship is None:
             return
         if memship.isAnonymousUser():
@@ -160,7 +157,7 @@ class WatcherList(object):
 
         Taken from PoiIssue.
         """
-        memship = getToolByName(self.context, 'portal_membership', None)
+        memship = getToolByName(self.context, "portal_membership", None)
         if memship is None:
             return False
         member = memship.getAuthenticatedMember()
@@ -189,15 +186,16 @@ class WatcherList(object):
         addresses = sets.Set()
 
         context = aq_inner(self.context)
-        memship = getToolByName(context, 'portal_membership', None)
+        memship = getToolByName(context, "portal_membership", None)
         if memship is None:
             # Okay, either we are in a simple unit test, or someone is
             # using this package outside of CMF/Plone.  We should
             # assume the watchers are simple email addresses.
             addresses.union_update(self.watchers)
         else:
-            addresses.union_update([get_member_email(w, memship)
-                                    for w in self.watchers])
+            addresses.union_update(
+                [get_member_email(w, memship) for w in self.watchers]
+            )
         addresses.union_update(self.extra_addresses)
 
         # Discard invalid addresses:
@@ -236,7 +234,7 @@ class WatcherList(object):
             return
         if isinstance(addresses, basestring):
             addresses = [addresses]
-        immediate = kw.pop('immediate', False)
+        immediate = kw.pop("immediate", False)
 
         request = context.REQUEST
         mail_content = getMultiAdapter((context, request), name=view_name)

@@ -2,7 +2,7 @@ from collective.watcherlist import utils
 import logging
 
 
-logger = logging.getLogger('collective.watcherlist')
+logger = logging.getLogger("collective.watcherlist")
 
 
 def simple_send_mail(message, addresses, subject, immediate=False):
@@ -35,14 +35,15 @@ def simple_send_mail(message, addresses, subject, immediate=False):
     """
     mail_host = utils.get_mail_host()
     if mail_host is None:
-        logger.warn("Cannot send notification email: please configure "
-                    "MailHost correctly.")
+        logger.warn(
+            "Cannot send notification email: please configure " "MailHost correctly."
+        )
         # We print some info, which is perfect for checking in unit
         # tests.
-        print 'Subject =', subject
-        print 'Addresses =', addresses
-        print 'Message ='
-        print message
+        print("Subject =", subject)
+        print("Addresses =", addresses)
+        print("Message =")
+        print(message)
         return
 
     mfrom = utils.get_mail_from_address()
@@ -57,4 +58,5 @@ def simple_send_mail(message, addresses, subject, immediate=False):
             mfrom=mfrom,
             subject=subject,
             immediate=immediate,
-            charset=header_charset)
+            charset=header_charset,
+        )

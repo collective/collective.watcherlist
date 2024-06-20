@@ -16,25 +16,21 @@ class BaseMail(BrowserView):
 
     @property
     def html(self):
-        """The html version of the e-mail.
-        """
-        return u''
+        """The html version of the e-mail."""
+        return ""
 
     @property
     def plain(self):
-        """The plain text version of the e-mail.
-        """
-        return u''
+        """The plain text version of the e-mail."""
+        return ""
 
     @property
     def subject(self):
-        """The subject of the e-mail.
-        """
-        return u'[No subject]'
+        """The subject of the e-mail."""
+        return "[No subject]"
 
     def update(self, **kw):
-        """Override this method to do something with the keyword arguments.
-        """
+        """Override this method to do something with the keyword arguments."""
         pass
 
     def __call__(self):
@@ -48,13 +44,13 @@ class BaseMail(BrowserView):
         To view the plain text version, visit
         .../@@your-view?type=plain
         """
-        type_ = self.request.get('type', '')
-        if type_ == 'plain':
+        type_ = self.request.get("type", "")
+        if type_ == "plain":
             # This may be a page template, but we want it to be
             # visible as plain text in the browser always.
-            self.request.response.setHeader('content-type', 'text/plain')
+            self.request.response.setHeader("content-type", "text/plain")
             return self.plain
-        elif type_ == 'subject':
+        elif type_ == "subject":
             return self.subject
         return self.html
 
@@ -71,7 +67,7 @@ class BaseMail(BrowserView):
         # We must choose the body charset manually.  Note that the
         # goal and effect of this loop is to determine the
         # body_charset.
-        for body_charset in 'US-ASCII', utils.get_charset(), 'UTF-8':
+        for body_charset in "US-ASCII", utils.get_charset(), "UTF-8":
             try:
                 plain.encode(body_charset)
                 html.encode(body_charset)
@@ -80,11 +76,11 @@ class BaseMail(BrowserView):
             else:
                 break
         # Encoding should work now; let's replace errors just in case.
-        plain = plain.encode(body_charset, 'replace')
-        html = html.encode(body_charset, 'xmlcharrefreplace')
+        plain = plain.encode(body_charset, "replace")
+        html = html.encode(body_charset, "xmlcharrefreplace")
 
-        text_part = MIMEText(plain, 'plain', body_charset)
-        html_part = MIMEText(html, 'html', body_charset)
+        text_part = MIMEText(plain, "plain", body_charset)
+        html_part = MIMEText(html, "html", body_charset)
 
         # No sense in sending plain text and html when we only have
         # one of those:
@@ -94,8 +90,8 @@ class BaseMail(BrowserView):
             return text_part
 
         # Okay, we send both plain text and html
-        email_msg = MIMEMultipart('alternative')
-        email_msg.epilogue = ''
+        email_msg = MIMEMultipart("alternative")
+        email_msg.epilogue = ""
         email_msg.attach(text_part)
         email_msg.attach(html_part)
         return email_msg

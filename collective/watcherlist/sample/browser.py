@@ -8,7 +8,7 @@ class NewsItemMail(BaseMail):
 
     @property
     def subject(self):
-        return u'Newsflash: ' + self.context.Title()
+        return "Newsflash: " + self.context.Title()
 
     @property
     def html(self):
@@ -20,8 +20,7 @@ class InternationalMail(BaseMail):
     @property
     def plain(self):
         # This says: Breaking international news
-        return u'Breaking \xefnt\xe9rn\xe4ti\xf3nal news: %s' % (
-            self.context.Title())
+        return "Breaking \xefnt\xe9rn\xe4ti\xf3nal news: %s" % (self.context.Title())
 
 
 class SubscriptionForm(BrowserView):
@@ -29,10 +28,10 @@ class SubscriptionForm(BrowserView):
     def __call__(self):
         context = aq_inner(self.context)
         watchers = IWatcherList(context)
-        email = self.request.form.get('email')
+        email = self.request.form.get("email")
         if email:
             watchers.watchers.append(email)
-        if self.request.form.get('toggle'):
+        if self.request.form.get("toggle"):
             watchers.toggle_watching()
         # Return the rendered form.
         return self.index()
@@ -48,4 +47,4 @@ class SubscriptionOverview(BrowserView):
     def __call__(self):
         context = aq_inner(self.context)
         watchers = IWatcherList(context)
-        return '\n'.join(watchers.addresses)
+        return "\n".join(watchers.addresses)

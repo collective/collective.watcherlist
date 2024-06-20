@@ -16,27 +16,23 @@ from collective.watcherlist.i18n import _
 class IWatchingAction(interface.Interface):
     """Definition of the configuration available for a watching action."""
 
-    watching = schema.Choice(
-        title=_(u"Change watching"),
-        vocabulary=watchingChoice
-    )
+    watching = schema.Choice(title=_("Change watching"), vocabulary=watchingChoice)
 
     name = schema.ASCIILine(
-        title=_(u"Name of your adapter"),
-        description=_(u"Leave that empty if you don't"
-                      u" know what you're doing."),
-        missing_value='',
-        required=False
+        title=_("Name of your adapter"),
+        description=_("Leave that empty if you don't" " know what you're doing."),
+        missing_value="",
+        required=False,
     )
 
 
 class WatchingAction(SimpleItem):
     interface.implements(IWatchingAction, IRuleElementData)
 
-    watching = 'watch'
-    name = ''
-    element = 'collective.watcherlist.actions.Watching'
-    summary = _(u'Change if the user is in the watchers list or not.')
+    watching = "watch"
+    name = ""
+    element = "collective.watcherlist.actions.Watching"
+    summary = _("Change if the user is in the watchers list or not.")
 
 
 class WatchingActionExecutor(object):
@@ -53,16 +49,13 @@ class WatchingActionExecutor(object):
         name = self.element.name
         obj = self.event.object
         watchers = component.queryAdapter(
-            obj,
-            interface=IWatcherList,
-            name=name,
-            default=None
+            obj, interface=IWatcherList, name=name, default=None
         )
         if watchers is None:
             return False
-        if watching == 'watch' and watchers.isWatching():
+        if watching == "watch" and watchers.isWatching():
             return True
-        if watching == 'unwatch' and not watchers.isWatching():
+        if watching == "unwatch" and not watchers.isWatching():
             return True
         watchers.toggle_watching()
         return True
@@ -70,10 +63,11 @@ class WatchingActionExecutor(object):
 
 class WatchingActionAddForm(AddForm):
     form_fields = form.FormFields(IWatchingAction)
-    label = _(u'Add watching action')
-    description = _(u'An action which can add or remove a user '
-                    u'from the watchers list')
-    form_name = _p(u'Configure element')
+    label = _("Add watching action")
+    description = _(
+        "An action which can add or remove a user " "from the watchers list"
+    )
+    form_name = _p("Configure element")
 
     def create(self, data):
         a = WatchingAction()
@@ -83,7 +77,8 @@ class WatchingActionAddForm(AddForm):
 
 class WatchingActionEditForm(EditForm):
     form_fields = form.FormFields(IWatchingAction)
-    label = _(u'Edit watching action')
-    description = _(u'An action which can add or remove a user '
-                    u'from the watchers list')
-    form_name = _p(u'Configure element')
+    label = _("Edit watching action")
+    description = _(
+        "An action which can add or remove a user " "from the watchers list"
+    )
+    form_name = _p("Configure element")
