@@ -2,10 +2,14 @@ from AccessControl import Unauthorized
 from email.utils import formataddr
 from email.utils import parseaddr
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone.utils import safe_unicode
 from zope.component import getMultiAdapter
 from zope.component.hooks import getSite
 
+
+try:
+    from plone.base.utils import safe_text
+except ImportError:
+    from Products.CMFPlone.utils import safe_text
 
 try:
     # Plone 5
@@ -48,7 +52,7 @@ def get_charset():
 
 def su(value):
     """Return safe unicode version of value."""
-    return safe_unicode(value, encoding=get_charset())
+    return safe_text(value, encoding=get_charset())
 
 
 def get_mail_host():

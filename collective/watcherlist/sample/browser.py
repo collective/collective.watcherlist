@@ -1,6 +1,7 @@
 from Acquisition import aq_inner
 from collective.watcherlist.browser import BaseMail
 from collective.watcherlist.interfaces import IWatcherList
+from plone.app.textfield.value import RichTextValue
 from Products.Five.browser import BrowserView
 
 
@@ -12,7 +13,10 @@ class NewsItemMail(BaseMail):
 
     @property
     def html(self):
-        return self.context.getRawText()
+        text = self.context.text
+        if isinstance(text, RichTextValue):
+            return text.output()
+        return text
 
 
 class InternationalMail(BaseMail):

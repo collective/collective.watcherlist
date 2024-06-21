@@ -1,6 +1,6 @@
 from collective.watcherlist import utils
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEText import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from Products.Five.browser import BrowserView
 
 

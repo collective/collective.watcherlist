@@ -5,38 +5,38 @@
 
   <adapter
       factory="collective.watcherlist.watchers.WatcherList"
-      for="Products.ATContentTypes.interfaces.IATContentType"
+      for="plone.dexterity.interfaces.IDexterityContent"
       />
 
   <subscriber
-      for="Products.ATContentTypes.interfaces.IATContentType
+      for="plone.dexterity.interfaces.IDexterityContent
            Products.DCWorkflow.interfaces.IAfterTransitionEvent"
       handler=".eventhandlers.mail_news"
       />
 
   <subscriber
-      for="Products.Archetypes.interfaces.IBaseContent
+      for="plone.dexterity.interfaces.IDexterityContent
            zope.lifecycleevent.interfaces.IObjectModifiedEvent"
       handler=".eventhandlers.mail_i18n"
       />
 
   <browser:page
       name="newsitem-mail"
-      for="Products.ATContentTypes.interfaces.IATContentType"
+      for="plone.dexterity.interfaces.IDexterityContent"
       class=".browser.NewsItemMail"
       permission="zope2.View"
       />
 
   <browser:page
       name="i18n-mail"
-      for="Products.Archetypes.interfaces.IBaseContent"
+      for="plone.dexterity.interfaces.IDexterityContent"
       class=".browser.InternationalMail"
       permission="zope2.View"
       />
 
   <browser:page
       name="subscription_form"
-      for="Products.ATContentTypes.interfaces.IATContentType"
+      for="plone.dexterity.interfaces.IDexterityContent"
       class=".browser.SubscriptionForm"
       template="form.pt"
       permission="zope2.View"
@@ -44,7 +44,7 @@
 
   <browser:page
       name="subscription_overview"
-      for="Products.ATContentTypes.interfaces.IATContentType"
+      for="plone.dexterity.interfaces.IDexterityContent"
       class=".browser.SubscriptionOverview"
       permission="zope2.View"
       />

@@ -38,8 +38,11 @@ will run some tests.
 We start a test browser session as anonymous user and open the
 subscription form::
 
-    >>> browser = self.browser
-    >>> news = self.portal.news
+    >>> from plone import api
+    >>> portal = api.portal.get()
+    >>> news = portal.news
+    >>> from plone.testing.zope import Browser
+    >>> browser = Browser(portal)
     >>> browser.open(news.absolute_url() + '/@@subscription_form')
     >>> "Subscribe this email address to this folder" in browser.contents
     True
@@ -50,12 +53,19 @@ To ease testing a bit, we have defined a very simple browser view that
 anyone can see and that shows the email addresses of the watchers::
 
     >>> browser.open(news.absolute_url() + '/@@subscription_overview')
-    >>> print browser.contents
+    >>> print(browser.contents)
     guido@example.com
 
 We log in as test user and subscribe too::
 
-    >>> self.browser_login()
+    >>> from plone.app.testing import TEST_USER_PASSWORD
+    >>> def browser_login(username):
+    ...     browser.open(portal.absolute_url() + '/login_form')
+    ...     browser.getControl(name='__ac_name').value = username
+    ...     browser.getControl(name='__ac_password').value = TEST_USER_PASSWORD
+    ...     browser.getControl('Log in').click()
+
+    >>> browser_login("maurits")
     >>> browser.open(news.absolute_url() + '/@@subscription_form')
     >>> "Subscribe this member to this folder" in browser.contents
     True
@@ -66,41 +76,40 @@ we assume he does not need to get an email when he himself does
 something that triggers email sending::
 
     >>> browser.open(news.absolute_url() + '/@@subscription_overview')
-    >>> print browser.contents
+    >>> print(browser.contents)
     guido@example.com
 
 We might want to change that, or make it easier for others to change.
 
 Anyway, we logout and see what gets reported now::
 
-    >>> browser.open(self.portal.absolute_url() + '/logout')
+    >>> browser.open(portal.absolute_url() + '/logout')
     >>> browser.open(news.absolute_url() + '/@@subscription_overview')
-    >>> print browser.contents
-    guido@example.com
-    testuser@example.com
+    >>> sorted(browser.contents.splitlines())
+    ['guido@example.com', 'maurits@example.com']
 
 We will be sending out emails, so first we make sure there are no
 messages in our mock mailhost::
 
-    >>> self.portal.MailHost.reset()
-    >>> len(self.portal.MailHost.messages)
+    >>> portal.MailHost.reset()
+    >>> len(portal.MailHost.messages)
     0
 
 Now we login as portal owner.
 
-    >>> self.browser_login('portal_owner')
+    >>> browser_login('site_admin')
 
 We can use the browser to check what the contents of the mail sent for
 a news item will be.  Default is to show the html content, but we can
 give some options too:
 
     >>> browser.open(news.first.absolute_url() + '/@@newsitem-mail')
-    >>> print browser.contents
+    >>> print(browser.contents)
     <...p>Have I got news for <em>you</em>!</p>...
     >>> browser.open(news.first.absolute_url() + '/@@newsitem-mail?type=plain')
-    >>> print browser.contents
+    >>> print(browser.contents)
     >>> browser.open(news.first.absolute_url() + '/@@newsitem-mail?type=subject')
-    >>> print browser.contents
+    >>> print(browser.contents)
     Newsflash: First News
 
 Now we publish the news item::
@@ -114,9 +123,9 @@ in Plone 4 and 5 create the email.  So we do some tricks to only check the
 most important parts of the mail, where we do not care about the
 order::
 
-    >>> len(self.portal.MailHost.messages)
+    >>> len(portal.MailHost.messages)
     2
-    >>> mail = sorted(str(self.portal.MailHost.messages[0]).splitlines())
+    >>> mail = sorted(str(portal.MailHost.messages[0]).splitlines())
     >>> print '\n'.join(mail)
     <BLANKLINE>
     <p>Have I got news for <em>you</em>!</p>
@@ -127,7 +136,7 @@ order::
     ...
     Subject:...Newsflash...First...
     To: guido@example...
-    >>> mail = sorted(str(self.portal.MailHost.messages[1]).splitlines())
+    >>> mail = sorted(str(portal.MailHost.messages[1]).splitlines())
     >>> print '\n'.join(mail)
     <BLANKLINE>
     <p>Have I got news for <em>you</em>!</p>
@@ -138,14 +147,14 @@ order::
     ...
     Subject:...Newsflash...First...
     To: testuser@example...
-    >>> self.portal.MailHost.reset()
+    >>> portal.MailHost.reset()
 
 To test possible problems with non-ascii characters, we have prepared
 another mail and we check this is the browser again; depending on
 which mailhost version is used, the result can be slightly different::
 
     >>> browser.open(news.first.absolute_url() + '/@@i18n-mail')
-    >>> print browser.contents
+    >>> print(browser.contents)
     >>> browser.open(news.first.absolute_url() + '/@@i18n-mail?type=plain')
     >>> browser.contents == 'Breaking \xefnt\xe9rn\xe4ti\xf3nal news: First News' or browser.contents == 'Breaking \xc3\xafnt\xc3\xa9rn\xc3\xa4ti\xc3\xb3nal news: First News'
     True
@@ -155,7 +164,7 @@ which mailhost version is used, the result can be slightly different::
 We have not specified a subject::
 
     >>> browser.open(news.first.absolute_url() + '/@@i18n-mail?type=subject')
-    >>> print browser.contents
+    >>> print(browser.contents)
     [No subject]
 
 Just for laughs we have registered an event handler that sends this
@@ -165,12 +174,12 @@ trigger that manually or better, by editing::
     >>> browser.open(news.first.absolute_url() + '/edit')
     >>> browser.getControl(name='title').value = 'First i18n news'
     >>> browser.getControl('Save').click()
-    >>> len(self.portal.MailHost.messages)
+    >>> len(portal.MailHost.messages)
     2
 
 Note the different charset and encoding::
 
-    >>> mail = sorted(str(self.portal.MailHost.messages[0]).splitlines())
+    >>> mail = sorted(str(portal.MailHost.messages[0]).splitlines())
     >>> print '\n'.join(mail)
     <BLANKLINE>
     ...
@@ -182,23 +191,20 @@ Note the different charset and encoding::
     To: guido@example...
     >>> 'QnJlYWtpbmcgw69udMOpcm7DpHRpw7NuYWwgbmV3czogRmlyc3QgaTE4biBuZXdz' in mail or 'Breaking =C3=AFnt=C3=A9rn=C3=A4ti=C3=B3nal news: First i18n news' in mail
     True
-    >>> self.portal.MailHost.reset()
+    >>> portal.MailHost.reset()
 
 We do the last edit another time and first unconfigure the MailHost,
 to see if this indeed prevents sending emails (it will print the mail
 for debugging purposes)::
 
-    >>> ori_smtp_host = self.get_smtp_host()
-    >>> self.configure_mail_host(u'')
     >>> browser.open(news.first.absolute_url() + '/edit')
     >>> browser.getControl('Save').click()
     Subject = [No subject]
     Addresses = ('guido@example.com', 'testuser@example.com')
     Message =
     ...
-    >>> len(self.portal.MailHost.messages)
+    >>> len(portal.MailHost.messages)
     0
-    >>> self.configure_mail_host(ori_smtp_host)
 
 Let's play with disallowing recursiveness.
 

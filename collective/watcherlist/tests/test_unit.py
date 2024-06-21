@@ -4,7 +4,9 @@ import doctest
 import unittest
 
 
-OPTIONFLAGS = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
+OPTIONFLAGS = (
+    doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE | doctest.REPORT_ONLY_FIRST_FAILURE
+)
 
 
 def test_suite():

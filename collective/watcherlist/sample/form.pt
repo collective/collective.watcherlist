@@ -1,6 +1,6 @@
-<html>
+<html i18n:domain="collective.watcherlist">
   <head>
-    <title>Watch this folder</title>
+    <title i18n:translate="">Watch this folder</title>
   </head>
   <body>
     <form action="@@subscription_form"
@@ -16,6 +16,7 @@
         <input name="submit"
                type="submit"
                value="Subscribe this email address to this folder"
+               i18n:attributes="value"
         />
       </div>
       <div tal:condition="not:isAnon">
@@ -23,11 +24,13 @@
                type="submit"
                value="Unsubscribe this member from this folder"
                tal:condition="view/is_watching"
+               i18n:attributes="value"
         />
         <input name="toggle"
                type="submit"
                value="Subscribe this member to this folder"
                tal:condition="not:view/is_watching"
+               i18n:attributes="value"
         />
       </div>
     </form>

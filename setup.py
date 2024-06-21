@@ -35,6 +35,7 @@ setup(
     zip_safe=False,
     install_requires=[
         "Products.CMFPlone",
+        "plone.api",
         "setuptools",
         "zope.formlib",
     ],

@@ -10,8 +10,9 @@ from Products.CMFPlone import PloneMessageFactory as _p
 from zope import component
 from zope import interface
 from zope import schema
-from zope.component import adapts
+from zope.component import adapter
 from zope.formlib import form
+from zope.interface import implementer
 
 
 class IWatchingAction(interface.Interface):
@@ -27,8 +28,8 @@ class IWatchingAction(interface.Interface):
     )
 
 
+@implementer(IWatchingAction, IRuleElementData)
 class WatchingAction(SimpleItem):
-    interface.implements(IWatchingAction, IRuleElementData)
 
     watching = "watch"
     name = ""
@@ -36,9 +37,9 @@ class WatchingAction(SimpleItem):
     summary = _("Change if the user is in the watchers list or not.")
 
 
+@implementer(IExecutable)
+@adapter(interface.Interface, IWatchingAction, interface.Interface)
 class WatchingActionExecutor:
-    interface.implements(IExecutable)
-    adapts(interface.Interface, IWatchingAction, interface.Interface)
 
     def __init__(self, context, element, event):
         self.context = context

@@ -10,10 +10,9 @@ from Products.CMFCore.utils import getToolByName
 from zope.annotation.interfaces import IAnnotations
 from zope.component import getMultiAdapter
 from zope.event import notify
-from zope.interface import implements
+from zope.interface import implementer
 
 import logging
-import sets
 
 
 logger = logging.getLogger("collective.watcherlist")
@@ -21,6 +20,7 @@ logger = logging.getLogger("collective.watcherlist")
 _marker = object()
 
 
+@implementer(IWatcherList)
 class WatcherList:
     """Adapter for lists of watchers.
 
@@ -38,7 +38,6 @@ class WatcherList:
 
     """
 
-    implements(IWatcherList)
     ANNO_KEY = "collective.watcherlist"
 
     def __init__(self, context):
@@ -185,7 +184,7 @@ class WatcherList:
             return ()
 
         # make sure no duplicates are added
-        addresses = sets.Set()
+        addresses = set()
 
         context = aq_inner(self.context)
         memship = getToolByName(context, "portal_membership", None)
@@ -193,12 +192,11 @@ class WatcherList:
             # Okay, either we are in a simple unit test, or someone is
             # using this package outside of CMF/Plone.  We should
             # assume the watchers are simple email addresses.
-            addresses.union_update(self.watchers)
+            addresses |= set(self.watchers)
         else:
-            addresses.union_update(
-                [get_member_email(w, memship) for w in self.watchers]
-            )
-        addresses.union_update(self.extra_addresses)
+            addresses |= {get_member_email(w, memship) for w in self.watchers}
+
+        addresses |= set(self.extra_addresses)
 
         # Discard invalid addresses:
         addresses.discard(None)
@@ -210,7 +208,7 @@ class WatcherList:
             # Get addresses from parent (might be recursive).
             parent_list = IWatcherList(aq_parent(context), None)
             if parent_list is not None:
-                addresses.union_update(parent_list.addresses)
+                addresses |= set(parent_list.addresses)
 
         return tuple(addresses)
 
