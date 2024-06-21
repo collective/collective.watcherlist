@@ -4,3 +4,6 @@
 [meta]
 template = "default"
 commit-id = "a89af8f2"
+
+[github]
+py_versions = "3.8"
