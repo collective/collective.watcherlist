@@ -2,7 +2,6 @@ from AccessControl import Unauthorized
 from email.utils import formataddr
 from email.utils import parseaddr
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone.utils import getSiteEncoding
 from Products.CMFPlone.utils import safe_unicode
 from zope.component import getMultiAdapter
 from zope.component.hooks import getSite
@@ -43,7 +42,7 @@ def get_charset():
         charset = mail_settings.email_charset
 
     if not charset:
-        charset = getSiteEncoding(portal)
+        charset = "utf-8"
     return charset
 
 
