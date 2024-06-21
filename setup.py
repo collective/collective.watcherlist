@@ -16,12 +16,13 @@ setup(
     description="Send emails from Plone to interested members (watchers)",
     long_description=readme + "\n" + tests + "\n" + changes,
     classifiers=[
+        "Development Status :: 5 - Production/Stable",
         "Framework :: Plone",
-        "Framework :: Plone :: 4.3",
-        "Framework :: Plone :: 5.0",
+        "Framework :: Plone :: 5.2",
+        "Framework :: Plone :: 6.0",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.8",
     ],
     keywords="Plone notifications watching",
     author="Maurits van Rees",
@@ -37,9 +38,10 @@ setup(
         "setuptools",
         "zope.formlib",
     ],
+    python_requires=">=3.8, <4",
     extras_require={
         "test": [
-            "Products.PloneTestCase",
+            "plone.app.testing",
         ],
     },
     entry_points="""
