@@ -7,3 +7,13 @@ commit-id = "a89af8f2"
 
 [github]
 py_versions = "3.8"
+
+[github]
+jobs = [
+   "qa",
+   "test",
+   "coverage",
+#   "dependencies", TODO: enable this job later
+   "release_ready",
+   "circular",
+   ]
