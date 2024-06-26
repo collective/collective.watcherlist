@@ -1,3 +1,21 @@
+4.0.0a1 (2024-06-26)
+--------------------
+
+Breaking changes:
+
+
+- Update for Plone 5.2 and 6.0, Python 3 only.
+  Drop support for older versions.
+  [thet, ale-rt, maurits] (#14)
+
+
+Internal:
+
+
+- Update configuration files.
+  [plone devs]
+
+
 Changelog
 =========
 
