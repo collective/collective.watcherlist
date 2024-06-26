@@ -74,16 +74,16 @@ code is simple::
 
   >>> watcherlist.watchers.append('maurits@example.org')
   >>> watcherlist.watchers.append('reinout@example.org')
-  >>> watcherlist.watchers
+  >>> sorted(watcherlist.watchers)
   ['maurits@example.org', 'reinout@example.org']
-  >>> watcherlist.addresses
-  ('maurits@example.org', 'reinout@example.org')
+  >>> sorted(watcherlist.addresses)
+  ['maurits@example.org', 'reinout@example.org']
 
 You can always switch off email sending.  This has the effect that no
 addresses are reported::
 
   >>> watcherlist.send_emails = False
-  >>> watcherlist.watchers
+  >>> sorted(watcherlist.watchers)
   ['maurits@example.org', 'reinout@example.org']
   >>> watcherlist.addresses
   ()
@@ -91,10 +91,10 @@ addresses are reported::
 Undo that::
 
   >>> watcherlist.send_emails = True
-  >>> watcherlist.watchers
+  >>> sorted(watcherlist.watchers)
   ['maurits@example.org', 'reinout@example.org']
-  >>> watcherlist.addresses
-  ('maurits@example.org', 'reinout@example.org')
+  >>> sorted(watcherlist.addresses)
+  ['maurits@example.org', 'reinout@example.org']
 
 Now we send an email.  We get the email text and subject simply from a
 browser view that we define.  In the test this means we need to give
@@ -108,7 +108,7 @@ We now send an invitation email, but this fails::
   >>> watcherlist.send('invitation')
   Traceback (most recent call last):
   ...
-  ComponentLookupError...
+  zope.interface.interfaces.ComponentLookupError...
 
 This means we need to create a browser view with that name.  As the
 basis we should take the base browser view defined in the
@@ -137,11 +137,10 @@ And we send the invitation again, in both plain text and html.  In
 this test we have no proper mail host setup, so we simply print the
 relevant info so we can see what would happen::
 
-  >>> watcherlist.send('invitation')
+  >>> mail = watcherlist.send('invitation')
   Subject = Maurits' birthday
-  Addresses = ('maurits@example.org', 'reinout@example.org')
+  Addresses = ...
   Message =
-  From...
   Content-Type: multipart/alternative;...
   ...
   Content-Type: text/plain; charset="us-ascii"
@@ -158,9 +157,8 @@ Let's skip the html and see if that simplifies the mail::
   >>> PartyMail.html = ''
   >>> watcherlist.send('invitation')
   Subject = Maurits' birthday
-  Addresses = ('maurits@example.org', 'reinout@example.org')
+  Addresses = ...maurits@example.org...
   Message =
-  From...
   MIME-Version: 1.0
   Content-Type: text/plain; charset="us-ascii"
   Content-Transfer-Encoding: 7bit
@@ -177,9 +175,8 @@ Let's add a bit of html again to see that only html goes fine too::
   >>> PartyMail.html = '<p>You are invited.</p>'
   >>> watcherlist.send('invitation')
   Subject = Maurits' birthday
-  Addresses = ('maurits@example.org', 'reinout@example.org')
+  Addresses = ...maurits@example.org...
   Message =
-  From...
   MIME-Version: 1.0
   Content-Type: text/html; charset="us-ascii"
   Content-Transfer-Encoding: 7bit

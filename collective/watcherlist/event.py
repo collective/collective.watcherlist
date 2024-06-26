@@ -1,22 +1,24 @@
-from zope.component.interfaces import IObjectEvent
-from zope.component.interfaces import ObjectEvent
-from zope import interface
+from zope.interface import implementer
+from zope.interface.interfaces import IObjectEvent
+from zope.interface.interfaces import ObjectEvent
 
 
 class IAddedToWatchingEvent(IObjectEvent):
     """Event for when a user is added to the watchers list."""
 
 
+@implementer(IAddedToWatchingEvent)
 class AddedToWatchingEvent(ObjectEvent):
-    interface.implements(IAddedToWatchingEvent)
+    pass
 
 
 class IRemovedFromWatchingEvent(IObjectEvent):
     """Event for when a user is removed from the watchers list."""
 
 
+@implementer(IRemovedFromWatchingEvent)
 class RemovedFromWatchingEvent(ObjectEvent):
-    interface.implements(IRemovedFromWatchingEvent)
+    pass
 
 
 class IToggleWatchingEvent(IObjectEvent):
@@ -24,5 +26,6 @@ class IToggleWatchingEvent(IObjectEvent):
     This event is sent before the add or remove events."""
 
 
+@implementer(IToggleWatchingEvent)
 class ToggleWatchingEvent(ObjectEvent):
-    interface.implements(IToggleWatchingEvent)
+    pass

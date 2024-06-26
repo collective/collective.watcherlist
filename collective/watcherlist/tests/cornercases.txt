@@ -59,8 +59,8 @@ The send_emails property should always be a boolean::
   >>> wl.send_emails = 1
   >>> wl.send_emails
   True
-  >>> wl.addresses
-  ('list@example.org', 'mary@example.org', 'joe@example.org')
+  >>> sorted(wl.addresses)
+  ['joe@example.org', 'list@example.org', 'mary@example.org']
 
 We have no Plone Site setup, so no members can watch::
 
@@ -74,9 +74,9 @@ Let's see if we can mock a portal_membership tool into these tests,
 including mock users::
 
   >>> from persistent.interfaces import IPersistent
-  >>> from zope.interface import implements
+  >>> from zope.interface import classImplements
+
   >>> class MockMemship(object):
-  ...     implements(IPersistent)
   ...     current_member_name = None
   ...     members = []
   ...     def isAnonymousUser(self):
@@ -91,6 +91,7 @@ including mock users::
   ...         self.current_member_name = username
   ...     def logout(self):
   ...         self.current_member_name = None
+  >>> classImplements(MockMemship, IPersistent)
   >>> memship = MockMemship()
   >>> dummy.portal_membership = memship
 
@@ -149,13 +150,13 @@ Now toggle watching as authenticated member::
   True
   >>> wl.watchers
   ['joe@example.org', 'mary@example.org', 'pete']
-  >>> wl.addresses
-  ('list@example.org', 'mary@example.org', 'pete@example.org', 'joe@example.org')
+  >>> sorted(wl.addresses)
+  ['joe@example.org', 'list@example.org', 'mary@example.org', 'pete@example.org']
   >>> wl.toggle_watching()
-  >>> wl.watchers
+  >>> sorted(wl.watchers)
   ['joe@example.org', 'mary@example.org']
-  >>> wl.addresses
-  ('list@example.org', 'mary@example.org', 'joe@example.org')
+  >>> sorted(wl.addresses)
+  ['joe@example.org', 'list@example.org', 'mary@example.org']
 
 In Products.Poi the issues have their own 'watchers' field.  This
 returns a tuple instead of a list.  We respect that::
@@ -185,14 +186,14 @@ returns a tuple instead of a list.  We respect that::
 
 Let's test some utility functions a bit more.  Get a safe unicode
 version of a string or return unchanged; basically a small shim around
-safe_unicode from Plone, with the default charset set correctly::
+safe_text from Plone, with the default charset set correctly::
 
   >>> from collective.watcherlist.utils import su
   >>> su(None)
   >>> su("hi")
-  u'hi'
+  'hi'
   >>> su(u"hi")
-  u'hi'
+  'hi'
 
 Get the email of a member, with a few fallbacks::
 

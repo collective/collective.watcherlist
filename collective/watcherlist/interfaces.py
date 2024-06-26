@@ -9,5 +9,4 @@ class IWatcherList(Interface):
     send_emails = Attribute("Send e-mails yes/no")
 
     def send(view_name, **kw):
-        """Send mail to our addresses using browser view 'view_name'.
-        """
+        """Send mail to our addresses using browser view 'view_name'."""

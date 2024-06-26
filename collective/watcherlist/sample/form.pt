@@ -1,33 +1,37 @@
-<html>
+<html i18n:domain="collective.watcherlist">
   <head>
-    <title>Watch this folder</title>
+    <title i18n:translate="">Watch this folder</title>
   </head>
   <body>
     <form action="@@subscription_form"
-          tal:define="isAnon context/@@plone_portal_state/anonymous">
+          tal:define="
+            isAnon context/@@plone_portal_state/anonymous;
+          "
+    >
       <div tal:condition="isAnon">
-        <input
-            type="text"
-            name="email"
-            value=""
-            />
-        <input
-            type="submit"
-            name="submit"
-            value="Subscribe this email address to this folder"
-            />
+        <input name="email"
+               type="text"
+               value=""
+        />
+        <input name="submit"
+               type="submit"
+               value="Subscribe this email address to this folder"
+               i18n:attributes="value"
+        />
       </div>
       <div tal:condition="not:isAnon">
-        <input tal:condition="view/is_watching"
+        <input name="toggle"
                type="submit"
-               name="toggle"
                value="Unsubscribe this member from this folder"
-               />
-        <input tal:condition="not:view/is_watching"
+               tal:condition="view/is_watching"
+               i18n:attributes="value"
+        />
+        <input name="toggle"
                type="submit"
-               name="toggle"
                value="Subscribe this member to this folder"
-               />
+               tal:condition="not:view/is_watching"
+               i18n:attributes="value"
+        />
       </div>
     </form>
   </body>

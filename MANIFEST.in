@@ -2,3 +2,7 @@ graft collective
 graft docs
 include *.rst *.txt
 global-exclude *.pyc
+include .coveragerc
+include base.cfg
+include buildout.cfg
+prune news

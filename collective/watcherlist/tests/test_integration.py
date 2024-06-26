@@ -1,170 +1,150 @@
-from Acquisition import aq_base
-from Products.CMFPlone.tests.utils import MockMailHost
-from Products.Five import fiveconfigure
-from Products.MailHost.interfaces import IMailHost
-from Products.PloneTestCase import PloneTestCase as ptc
-from Products.PloneTestCase.layer import PloneSite
-from Testing import ZopeTestCase as ztc
-from zope.component import getSiteManager
+from plone import api
+from plone.app.testing import FunctionalTesting
+from plone.app.testing import IntegrationTesting
+from plone.app.testing import MOCK_MAILHOST_FIXTURE
+from plone.app.testing import PLONE_FIXTURE
+from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_PASSWORD
+from plone.app.textfield.value import RichTextValue
+from plone.testing import layered
+from plone.testing.zope import Browser
 
-# Sample implementation:
 import collective.watcherlist
 import collective.watcherlist.sample
 import doctest
 import unittest
 
-try:
-    # Plone 5
-    from Products.CMFPlone.interfaces.controlpanel import IMailSchema
-    from plone.registry.interfaces import IRegistry
-    from zope.component import getUtility
-except ImportError:
-    # Plone 4 and lower
-    IMailSchema = None
 
-try:
-    from Zope2.App import zcml
-    zcml  # pyflakes
-except ImportError:
-    from Products.Five import zcml
-ptc.setupPloneSite()
+class WatcherListLayer(PloneSandboxLayer):
 
-OPTIONFLAGS = (doctest.ELLIPSIS |
-               doctest.NORMALIZE_WHITESPACE)
+    defaultBases = (PLONE_FIXTURE,)
+
+    def setUpZope(self, app, configurationContext):
+        self.loadZCML(package=collective.watcherlist)
+        self.loadZCML(package=collective.watcherlist.sample)
+
+    def setUpPloneSite(self, portal):
+        """Create some content and some users"""
+        pw = api.portal.get_tool("portal_workflow")
+        pw.setDefaultChain("simple_publication_workflow")
+
+        with api.env.adopt_user("admin"):
+            portal.invokeFactory(
+                "Folder",
+                "news",
+                title="News",
+            )
+            api.content.transition(obj=portal.news, transition="publish")
+
+            sample_text = "<p>Have I got news for <em>you</em>!</p>"
+            portal.news.invokeFactory(
+                "News Item",
+                "first",
+                title="First News",
+                text=RichTextValue(
+                    raw=sample_text,
+                    mimeType="text/html",
+                    outputMimeType="text/x-html-safe",
+                ),
+            )
+            # Note: we do NOT publish the news items.
+            # In newsletter.txt we test that a mail gets send when we publish them.
+
+            portal.news.invokeFactory(
+                "News Item",
+                "second",
+                title="Second News",
+                text=RichTextValue(
+                    raw=sample_text,
+                    mimeType="text/html",
+                    outputMimeType="text/x-html-safe",
+                ),
+            )
+
+            # Add extra members
+            api.user.create(
+                username="site_admin",
+                email="site_admin@example.com",
+                password=TEST_USER_PASSWORD,
+                roles=["Site Administrator"],
+                properties={"fullname": "Site Admin"},
+            )
+
+            api.user.create(
+                username="maurits",
+                email="maurits@example.com",
+                password=TEST_USER_PASSWORD,
+                properties={"fullname": "Maurits van Rees"},
+            )
+            api.user.create(
+                username="reinout",
+                email="reinout@example.com",
+                password=TEST_USER_PASSWORD,
+                properties={"fullname": "Reinout van Rees"},
+            )
 
 
-class TestCase(ptc.PloneTestCase):
-
-    class layer(PloneSite):
-
-        @classmethod
-        def setUp(cls):
-            fiveconfigure.debug_mode = True
-            ztc.installPackage(collective.watcherlist)
-            # Load sample config:
-            zcml.load_config('', collective.watcherlist.sample)
-            fiveconfigure.debug_mode = False
-
-        @classmethod
-        def tearDown(cls):
-            pass
+WATCHERLIST_FIXTURE = WatcherListLayer()
+WATCHERLIST_INTEGRATION_TESTING = IntegrationTesting(
+    bases=(WATCHERLIST_FIXTURE, MOCK_MAILHOST_FIXTURE),
+    name="collective.watcherlist:Integration",
+)
+WATCHERLIST_FUNCTIONAL_TESTING = FunctionalTesting(
+    bases=(WATCHERLIST_FIXTURE, MOCK_MAILHOST_FIXTURE),
+    name="collective.watcherlist:Functional",
+)
 
 
-class FunctionalTestCase(TestCase, ptc.FunctionalTestCase):
+class TestMyView(unittest.TestCase):
 
-    def _setup(self):
-        ptc.PloneTestCase._setup(self)
-        # Replace normal mailhost with mock mailhost
-        self.portal._original_MailHost = self.portal.MailHost
-        self.portal.MailHost = mailhost = MockMailHost('MailHost')
-        sm = getSiteManager(context=self.portal)
-        sm.unregisterUtility(provided=IMailHost)
-        sm.registerUtility(mailhost, provided=IMailHost)
-        # Make sure our mock mailhost does not give a mailhost_warning
-        # in the overview-controlpanel.
-        self.configure_mail_host(u'mock', 'admin@example.com')
+    layer = WATCHERLIST_INTEGRATION_TESTING
 
-    def _clear(self, call_close_hook=0):
-        self.portal.MailHost = self.portal._original_MailHost
-        sm = getSiteManager(context=self.portal)
-        sm.unregisterUtility(provided=IMailHost)
-        sm.registerUtility(aq_base(self.portal._original_MailHost),
-                           provided=IMailHost)
-        ptc.PloneTestCase._clear(self)
-
-    def get_smtp_host(self):
-        if IMailSchema is None:
-            # Plone 4
-            return self.portal.MailHost.smtp_host
-        else:
-            # Plone 5.0 and higher
-            registry = getUtility(IRegistry)
-            mail_settings = registry.forInterface(
-                IMailSchema, prefix='plone', check=False)
-            return mail_settings.smtp_host
-
-    def configure_mail_host(self, smtp_host, address=None):
-        if IMailSchema is None:
-            # Plone 4
-            self.portal.MailHost.smtp_host = smtp_host
-            if address is not None:
-                self.portal.email_from_address = address
-        else:
-            # Plone 5.0 and higher
-            registry = getUtility(IRegistry)
-            mail_settings = registry.forInterface(
-                IMailSchema, prefix='plone', check=False)
-            if not isinstance(smtp_host, unicode):
-                # must be unicode
-                smtp_host = smtp_host.decode('utf-8')
-            mail_settings.smtp_host = smtp_host
-            if address is not None:
-                if isinstance(address, unicode):
-                    # must be ascii
-                    address = address.encode('utf-8')
-                mail_settings.email_from_address = address
+    def setUp(self):
+        self.portal = self.layer["portal"]
+        self.request = self.layer["request"]
 
     def afterSetUp(self):
-        """Add some extra content and do some setup.
-        """
+        """Add some extra content and do some setup."""
         # We need to do this as Manager:
-        self.setRoles(['Manager'])
+        self.setRoles(["Manager"])
 
-        # Add some news items:
-        sample_text = "<p>Have I got news for <em>you</em>!</p>"
-        self.portal.news.invokeFactory(
-            'News Item', 'first', title="First News", text=sample_text)
-        self.portal.news.invokeFactory(
-            'News Item', 'second', title="Second News", text=sample_text)
-
-        # Set fullname and email address of test user:
-        member = self.portal.portal_membership.getAuthenticatedMember()
-        member.setMemberProperties({'fullname': 'Test User',
-                                    'email': 'testuser@example.com'})
-
-        # Add extra members:
-        self.addMember('maurits', 'Maurits van Rees', 'maurits@example.com')
-        self.addMember('reinout', 'Reinout van Rees', 'reinout@example.com')
-
-        # Setup test browser:
-        try:
-            from Testing.testbrowser import Browser
-            Browser  # pyflakes
-        except ImportError:
-            from Products.Five.testbrowser import Browser
         self.browser = Browser()
         self.browser.handleErrors = False
-        self.browser.addHeader('Accept-Language', 'en-US')
+        self.browser.addHeader("Accept-Language", "en-US")
         self.portal.error_log._ignored_exceptions = ()
 
         # No more Manager:
         self.setRoles([])
 
     def addMember(self, username, fullname, email):
-        self.portal.portal_membership.addMember(
-            username, ptc.default_password, [], [])
+        self.portal.portal_membership.addMember(username, TEST_USER_PASSWORD, [], [])
         member = self.portal.portal_membership.getMemberById(username)
-        member.setMemberProperties({'fullname': fullname, 'email': email})
+        member.setMemberProperties({"fullname": fullname, "email": email})
 
     def browser_login(self, user=None):
         if not user:
-            user = ptc.default_user
-        self.browser.open(self.portal.absolute_url() + '/login_form')
-        self.browser.getLink('Log in').click()
-        self.browser.getControl(name='__ac_name').value = user
-        self.browser.getControl(name='__ac_password').value = \
-            ptc.default_password
-        self.browser.getControl(name='submit').click()
+            user = TEST_USER_ID
+        self.browser.open(self.portal.absolute_url() + "/login_form")
+        self.browser.getLink("Log in").click()
+        self.browser.getControl(name="__ac_name").value = user
+        self.browser.getControl(name="__ac_password").value = TEST_USER_PASSWORD
+        self.browser.getControl(name="submit").click()
+
+
+OPTIONFLAGS = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
 
 
 def test_suite():
-    return unittest.TestSuite([
-
-        ztc.FunctionalDocFileSuite(
-            'newsletter.txt', package='collective.watcherlist.sample',
-            test_class=FunctionalTestCase),
-
-    ])
-
-if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
+    suite = unittest.TestSuite()
+    suite.addTest(
+        layered(
+            doctest.DocFileSuite(
+                "newsletter.txt",
+                package="collective.watcherlist.sample",
+                optionflags=OPTIONFLAGS,
+            ),
+            layer=WATCHERLIST_FUNCTIONAL_TESTING,
+        )
+    )
+    return suite

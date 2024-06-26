@@ -1,25 +1,27 @@
-import logging
-from zope.component import getMultiAdapter
-from Acquisition import aq_inner, aq_parent
-from Products.CMFCore.utils import getToolByName
-from persistent.dict import PersistentDict
-from persistent.list import PersistentList
-from zope.annotation.interfaces import IAnnotations
-from zope.event import notify
-from zope.interface import implements
-import sets
-
+from Acquisition import aq_inner
+from Acquisition import aq_parent
+from collective.watcherlist import event
 from collective.watcherlist.interfaces import IWatcherList
 from collective.watcherlist.mailer import simple_send_mail
 from collective.watcherlist.utils import get_member_email
-from collective.watcherlist import event
+from persistent.dict import PersistentDict
+from persistent.list import PersistentList
+from Products.CMFCore.utils import getToolByName
+from zope.annotation.interfaces import IAnnotations
+from zope.component import getMultiAdapter
+from zope.event import notify
+from zope.interface import implementer
 
-logger = logging.getLogger('collective.watcherlist')
+import logging
+
+
+logger = logging.getLogger("collective.watcherlist")
 
 _marker = object()
 
 
-class WatcherList(object):
+@implementer(IWatcherList)
+class WatcherList:
     """Adapter for lists of watchers.
 
     The lists are stored on the content objects that are being
@@ -36,39 +38,35 @@ class WatcherList(object):
 
     """
 
-    implements(IWatcherList)
-    ANNO_KEY = 'collective.watcherlist'
+    ANNO_KEY = "collective.watcherlist"
 
     def __init__(self, context):
         self.context = context
         annotations = IAnnotations(self.context)
         self.__mapping = annotations.get(self.ANNO_KEY, None)
         if self.__mapping is None:
-            info = dict(
-                watchers=PersistentList(),
-                extra_addresses=PersistentList())
+            info = dict(watchers=PersistentList(), extra_addresses=PersistentList())
             self.__mapping = PersistentDict(info)
             annotations[self.ANNO_KEY] = self.__mapping
 
     def __get_watchers(self):
-        return self.__mapping.get('watchers')
+        return self.__mapping.get("watchers")
 
     def __set_watchers(self, v):
         if not isinstance(v, PersistentList):
             v = PersistentList(v)
-        self.__mapping['watchers'] = v
+        self.__mapping["watchers"] = v
 
     watchers = property(__get_watchers, __set_watchers)
 
     def __get_extra_addresses(self):
-        """Extra email addresses
-        """
-        return self.__mapping.get('extra_addresses')
+        """Extra email addresses"""
+        return self.__mapping.get("extra_addresses")
 
     def __set_extra_addresses(self, v):
         if not isinstance(v, PersistentList):
             v = PersistentList(v)
-        self.__mapping['extra_addresses'] = v
+        self.__mapping["extra_addresses"] = v
 
     extra_addresses = property(__get_extra_addresses, __set_extra_addresses)
 
@@ -80,7 +78,7 @@ class WatcherList(object):
         in the case of Poi we only set this on the tracker, not on
         individual issues.
         """
-        setting = self.__mapping.get('send_emails', _marker)
+        setting = self.__mapping.get("send_emails", _marker)
         if setting is not _marker:
             # We have an explicit setting.
             return setting
@@ -97,17 +95,17 @@ class WatcherList(object):
     def __set_send_emails(self, v):
         if not isinstance(v, bool):
             v = bool(v)
-        self.__mapping['send_emails'] = v
+        self.__mapping["send_emails"] = v
 
     send_emails = property(__get_send_emails, __set_send_emails)
 
     def __get_allow_recursive(self):
-        return self.__mapping.get('allow_recursive', True)
+        return self.__mapping.get("allow_recursive", True)
 
     def __set_allow_recursive(self, v):
         if not isinstance(v, bool):
             v = bool(v)
-        self.__mapping['allow_recursive'] = v
+        self.__mapping["allow_recursive"] = v
 
     allow_recursive = property(__get_allow_recursive, __set_allow_recursive)
 
@@ -128,7 +126,7 @@ class WatcherList(object):
 
         If the current value is a tuple, we keep it that way.
         """
-        memship = getToolByName(self.context, 'portal_membership', None)
+        memship = getToolByName(self.context, "portal_membership", None)
         if memship is None:
             return
         if memship.isAnonymousUser():
@@ -160,7 +158,7 @@ class WatcherList(object):
 
         Taken from PoiIssue.
         """
-        memship = getToolByName(self.context, 'portal_membership', None)
+        memship = getToolByName(self.context, "portal_membership", None)
         if memship is None:
             return False
         member = memship.getAuthenticatedMember()
@@ -186,19 +184,19 @@ class WatcherList(object):
             return ()
 
         # make sure no duplicates are added
-        addresses = sets.Set()
+        addresses = set()
 
         context = aq_inner(self.context)
-        memship = getToolByName(context, 'portal_membership', None)
+        memship = getToolByName(context, "portal_membership", None)
         if memship is None:
             # Okay, either we are in a simple unit test, or someone is
             # using this package outside of CMF/Plone.  We should
             # assume the watchers are simple email addresses.
-            addresses.union_update(self.watchers)
+            addresses |= set(self.watchers)
         else:
-            addresses.union_update([get_member_email(w, memship)
-                                    for w in self.watchers])
-        addresses.union_update(self.extra_addresses)
+            addresses |= {get_member_email(w, memship) for w in self.watchers}
+
+        addresses |= set(self.extra_addresses)
 
         # Discard invalid addresses:
         addresses.discard(None)
@@ -210,7 +208,7 @@ class WatcherList(object):
             # Get addresses from parent (might be recursive).
             parent_list = IWatcherList(aq_parent(context), None)
             if parent_list is not None:
-                addresses.union_update(parent_list.addresses)
+                addresses |= set(parent_list.addresses)
 
         return tuple(addresses)
 
@@ -234,9 +232,12 @@ class WatcherList(object):
         if not addresses:
             logger.info("No addresses found.")
             return
-        if isinstance(addresses, basestring):
+        if isinstance(addresses, str):
             addresses = [addresses]
-        immediate = kw.pop('immediate', False)
+        # For testing it is easiest to sort the addresses.
+        # Makes sense in general I would say.
+        addresses = tuple(sorted(addresses))
+        immediate = kw.pop("immediate", False)
 
         request = context.REQUEST
         mail_content = getMultiAdapter((context, request), name=view_name)
