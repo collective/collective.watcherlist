@@ -48,7 +48,8 @@ class WatcherListLayer(PloneSandboxLayer):
                     outputMimeType="text/x-html-safe",
                 ),
             )
-            api.content.transition(obj=portal.news.first, transition="publish")
+            # Note: we do NOT publish the news items.
+            # In newsletter.txt we test that a mail gets send when we publish them.
 
             portal.news.invokeFactory(
                 "News Item",
@@ -60,7 +61,6 @@ class WatcherListLayer(PloneSandboxLayer):
                     outputMimeType="text/x-html-safe",
                 ),
             )
-            api.content.transition(obj=portal.news.second, transition="publish")
 
             # Add extra members
             api.user.create(

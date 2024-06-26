@@ -115,6 +115,8 @@ give some options too:
 
 Now we publish the news item::
 
+    >>> api.content.get_state(obj=news.first)
+    'private'
     >>> browser.open(news.first.absolute_url())
     >>> browser.getLink('Publish').click()
 
