@@ -43,6 +43,7 @@ subscription form::
     >>> news = portal.news
     >>> from plone.testing.zope import Browser
     >>> browser = Browser(portal)
+    >>> browser.handleErrors = False
     >>> browser.open(news.absolute_url() + '/@@subscription_form')
     >>> "Subscribe this email address to this folder" in browser.contents
     True

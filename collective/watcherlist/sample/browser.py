@@ -15,7 +15,7 @@ class NewsItemMail(BaseMail):
     def html(self):
         text = self.context.text
         if isinstance(text, RichTextValue):
-            return text.output()
+            return text.output
         return text
 
 
