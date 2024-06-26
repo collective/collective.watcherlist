@@ -7,6 +7,7 @@ from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_PASSWORD
 from plone.app.textfield.value import RichTextValue
+from plone.testing import layered
 from plone.testing.zope import Browser
 
 import collective.watcherlist
@@ -136,29 +137,16 @@ OPTIONFLAGS = (
 )
 
 
-class DocTest(unittest.TestCase):
-    layer = WATCHERLIST_FUNCTIONAL_TESTING
-
-    def setUp(self):
-        super().setUp()
-        self.app = self.layer["app"]
-        self.portal = self.layer["portal"]
-
-    def test_doc_test(self):
-        suite = doctest.DocFileSuite(
-            "newsletter.txt",
-            package="collective.watcherlist.sample",
-            optionflags=OPTIONFLAGS,
-        )
-        runner = unittest.TextTestRunner()
-        runner.run(suite)
-
-
 def test_suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(DocTest))
+    suite.addTest(
+        layered(
+            doctest.DocFileSuite(
+                "newsletter.txt",
+                package="collective.watcherlist.sample",
+                optionflags=OPTIONFLAGS,
+            ),
+            layer=WATCHERLIST_FUNCTIONAL_TESTING,
+        )
+    )
     return suite
-
-
-if __name__ == "__main__":
-    unittest.main(defaultTest="test_suite")
