@@ -5,5 +5,4 @@ global-exclude *.pyc
 include .coveragerc
 include base.cfg
 include buildout.cfg
-recursive-include news *.gitkeep
-recursive-include news *.internal
+prune news
