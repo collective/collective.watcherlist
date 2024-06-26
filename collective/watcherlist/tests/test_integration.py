@@ -132,9 +132,7 @@ class TestMyView(unittest.TestCase):
         self.browser.getControl(name="submit").click()
 
 
-OPTIONFLAGS = (
-    doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE | doctest.REPORT_ONLY_FIRST_FAILURE
-)
+OPTIONFLAGS = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
 
 
 def test_suite():

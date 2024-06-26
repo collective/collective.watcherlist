@@ -92,9 +92,12 @@ Anyway, we logout and see what gets reported now::
 We will be sending out emails, so first we make sure there are no
 messages in our mock mailhost::
 
-    >>> portal.MailHost.reset()
-    >>> len(portal.MailHost.messages)
+    >>> mailhost = api.portal.get_tool(name="MailHost")
+    >>> mailhost.reset()
+    >>> len(mailhost.messages)
     0
+    >>> import transaction
+    >>> transaction.commit()
 
 Now we login as portal owner.
 
@@ -124,44 +127,53 @@ We have two watchers, so two emails are sent.  There are some minor
 differences in the way the SecureMailHost in Plone 3 and the MailHost
 in Plone 4 and 5 create the email.  So we do some tricks to only check the
 most important parts of the mail, where we do not care about the
-order::
+order.
+Also, if we try to get `portal.MailHost.messages` it is always empty,
+even after an explicit transaction commit, even though we are sure that
+mails have been sent.  So we use a browser view to get the messages::
 
-    >>> len(portal.MailHost.messages)
+    >>> browser.open(news.first.absolute_url() + '/@@messages?length')
+    >>> print(browser.contents)
     2
-    >>> mail = sorted(str(portal.MailHost.messages[0]).splitlines())
-    >>> print '\n'.join(mail)
+    >>> browser.open(news.first.absolute_url() + '/@@messages?message=0')
+    >>> mail = sorted(browser.contents.splitlines())
+    >>> print('\n'.join(mail))
     <BLANKLINE>
     <p>Have I got news for <em>you</em>!</p>
     Content-Transfer-Encoding: 7bit
     Content-Type: text/html; charset="us-ascii"
     Date: ...
-    From:...admin@example...
+    From: Plone site <noreply@example.com>
     ...
     Subject:...Newsflash...First...
     To: guido@example...
-    >>> mail = sorted(str(portal.MailHost.messages[1]).splitlines())
-    >>> print '\n'.join(mail)
+    >>> browser.open(news.first.absolute_url() + '/@@messages?message=1')
+    >>> mail = sorted(browser.contents.splitlines())
+    >>> print('\n'.join(mail))
     <BLANKLINE>
     <p>Have I got news for <em>you</em>!</p>
     Content-Transfer-Encoding: 7bit
     Content-Type: text/html; charset="us-ascii"
     Date: ...
-    From:...admin@example...
+    From: Plone site <noreply@example.com>
     ...
     Subject:...Newsflash...First...
-    To: testuser@example...
-    >>> portal.MailHost.reset()
+    To: maurits@example.com
+    >>> browser.open(news.first.absolute_url() + '/@@messages?reset')
+    >>> print(browser.contents)
+    reset
 
 To test possible problems with non-ascii characters, we have prepared
-another mail and we check this is the browser again; depending on
+another mail and we check this in the browser again; depending on
 which mailhost version is used, the result can be slightly different::
 
     >>> browser.open(news.first.absolute_url() + '/@@i18n-mail')
     >>> print(browser.contents)
+    b''
     >>> browser.open(news.first.absolute_url() + '/@@i18n-mail?type=plain')
     >>> browser.contents == 'Breaking \xefnt\xe9rn\xe4ti\xf3nal news: First News' or browser.contents == 'Breaking \xc3\xafnt\xc3\xa9rn\xc3\xa4ti\xc3\xb3nal news: First News'
     True
-    >>> browser.headers.gettype()
+    >>> browser.headers.get_content_type()
     'text/plain'
 
 We have not specified a subject::
@@ -175,39 +187,46 @@ mail when an object is modified that has 'i18n' in its title; let's
 trigger that manually or better, by editing::
 
     >>> browser.open(news.first.absolute_url() + '/edit')
-    >>> browser.getControl(name='title').value = 'First i18n news'
+    >>> browser.getControl(name='form.widgets.IDublinCore.title').value = 'First i18n news'
     >>> browser.getControl('Save').click()
-    >>> len(portal.MailHost.messages)
+    >>> browser.open(news.first.absolute_url() + '/@@messages?length')
+    >>> print(browser.contents)
     2
 
 Note the different charset and encoding::
 
-    >>> mail = sorted(str(portal.MailHost.messages[0]).splitlines())
-    >>> print '\n'.join(mail)
+    >>> browser.open(news.first.absolute_url() + '/@@messages?message=0')
+    >>> mail = sorted(browser.contents.splitlines())
+    >>> print('\n'.join(mail))
     <BLANKLINE>
     ...
     Content-Type: text/plain; charset="utf-8"
     Date: ...
-    From:...admin@example...
+    From: Plone site <noreply@example.com>
     ...
     Subject:...No...subject...
-    To: guido@example...
+    To: guido@example.com
     >>> 'QnJlYWtpbmcgw69udMOpcm7DpHRpw7NuYWwgbmV3czogRmlyc3QgaTE4biBuZXdz' in mail or 'Breaking =C3=AFnt=C3=A9rn=C3=A4ti=C3=B3nal news: First i18n news' in mail
     True
-    >>> portal.MailHost.reset()
+    >>> browser.open(news.first.absolute_url() + '/@@messages?reset')
 
 We do the last edit another time and first unconfigure the MailHost,
 to see if this indeed prevents sending emails (it will print the mail
 for debugging purposes)::
 
+    >>> browser.open(news.first.absolute_url() + '/@@messages?unconfigure')
+    >>> print(browser.contents)
+    unconfigure
     >>> browser.open(news.first.absolute_url() + '/edit')
     >>> browser.getControl('Save').click()
     Subject = [No subject]
-    Addresses = ('guido@example.com', 'testuser@example.com')
+    Addresses = ('guido@example.com', 'maurits@example.com')
     Message =
     ...
-    >>> len(portal.MailHost.messages)
-    0
+    >>> browser.open(news.first.absolute_url() + '/@@messages?configure')
+    >>> browser.open(news.first.absolute_url() + '/@@messages?length')
+    >>> print(browser.contents)
+    zero
 
 Let's play with disallowing recursiveness.
 
@@ -217,8 +236,8 @@ Let's play with disallowing recursiveness.
     True
     >>> first_list.watchers
     []
-    >>> first_list.addresses
-    ('guido@example.com',)
+    >>> sorted(first_list.addresses)
+    ['guido@example.com', 'maurits@example.com']
     >>> first_list.allow_recursive = False
     >>> first_list.watchers
     []

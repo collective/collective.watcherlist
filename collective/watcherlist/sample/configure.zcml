@@ -49,4 +49,11 @@
       permission="zope2.View"
       />
 
+  <browser:page
+      name="messages"
+      for="plone.dexterity.interfaces.IDexterityContent"
+      class=".browser.MessagesView"
+      permission="zope2.View"
+      />
+
 </configure>

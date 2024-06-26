@@ -37,7 +37,7 @@ def simple_send_mail(message, addresses, subject, immediate=False):
     mail_host = utils.get_mail_host()
     if mail_host is None:
         logger.warn(
-            "Cannot send notification email: please configure " "MailHost correctly."
+            "Cannot send notification email: please configure MailHost correctly."
         )
         # We print some info, which is perfect for checking in unit
         # tests.

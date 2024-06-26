@@ -234,6 +234,9 @@ class WatcherList:
             return
         if isinstance(addresses, str):
             addresses = [addresses]
+        # For testing it is easiest to sort the addresses.
+        # Makes sense in general I would say.
+        addresses = tuple(sorted(addresses))
         immediate = kw.pop("immediate", False)
 
         request = context.REQUEST
